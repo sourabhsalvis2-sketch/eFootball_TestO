@@ -1,0 +1,185 @@
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { TextField, Button, Box, Typography, Paper } from '@mui/material'
+import SecurityIcon from '@mui/icons-material/Security'
+import LoginIcon from '@mui/icons-material/Login'
+
+export default function AdminLogin() {
+  const [user, setUser] = useState('')
+  const [pass, setPass] = useState('')
+  const nav = useNavigate()
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (user === 'admin' && pass === 'admin123') nav('/admin/dashboard')
+    else alert('invalid')
+  }
+
+  return (
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '80vh',
+        px: 2
+      }}
+    >
+      <Paper 
+        elevation={24}
+        sx={{
+          p: 4,
+          maxWidth: 400,
+          width: '100%',
+          background: 'linear-gradient(135deg, rgba(6,30,60,0.95), rgba(2,8,20,0.98))',
+          border: '2px solid rgba(0,229,255,0.2)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(0,229,255,0.1)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'linear-gradient(90deg, #00e5ff, #0091ea, #00e5ff)',
+            opacity: 0.8,
+          }
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <SecurityIcon sx={{ fontSize: 48, color: '#00e5ff', mb: 1, filter: 'drop-shadow(0 0 8px rgba(0,229,255,0.6))' }} />
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontFamily: 'Orbitron', 
+              fontWeight: 700, 
+              color: '#ffffff',
+              textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+              mb: 1
+            }}
+          >
+            Admin Portal
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: '#b0bec5',
+              fontWeight: 500
+            }}
+          >
+            Tournament Management System
+          </Typography>
+        </Box>
+        
+        <form onSubmit={submit}>
+          <TextField 
+            fullWidth 
+            label="Username" 
+            value={user} 
+            onChange={e => setUser(e.target.value)} 
+            sx={{ 
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                color: '#ffffff',
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                '& fieldset': {
+                  borderColor: 'rgba(0,229,255,0.3)',
+                  borderWidth: '2px',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgba(0,229,255,0.5)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#00e5ff',
+                  boxShadow: '0 0 10px rgba(0,229,255,0.3)',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#b0bec5',
+                '&.Mui-focused': {
+                  color: '#00e5ff',
+                },
+              },
+              '& .MuiOutlinedInput-input': {
+                color: '#ffffff',
+                '&::placeholder': {
+                  color: '#b0bec5',
+                  opacity: 0.7,
+                },
+              },
+            }} 
+          />
+          <TextField 
+            fullWidth 
+            label="Password" 
+            type="password" 
+            value={pass} 
+            onChange={e => setPass(e.target.value)} 
+            sx={{ 
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                color: '#ffffff',
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                '& fieldset': {
+                  borderColor: 'rgba(0,229,255,0.3)',
+                  borderWidth: '2px',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgba(0,229,255,0.5)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#00e5ff',
+                  boxShadow: '0 0 10px rgba(0,229,255,0.3)',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#b0bec5',
+                '&.Mui-focused': {
+                  color: '#00e5ff',
+                },
+              },
+              '& .MuiOutlinedInput-input': {
+                color: '#ffffff',
+                '&::placeholder': {
+                  color: '#b0bec5',
+                  opacity: 0.7,
+                },
+              },
+            }} 
+          />
+          <Button 
+            variant="contained" 
+            type="submit" 
+            fullWidth
+            startIcon={<LoginIcon />}
+            sx={{
+              py: 1.5,
+              fontSize: '1.1rem',
+              fontWeight: 700,
+              background: 'linear-gradient(90deg, #00e5ff, #0091ea)',
+              color: '#0b0f16',
+              border: '2px solid transparent',
+              borderRadius: '8px',
+              textTransform: 'none',
+              transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                background: 'linear-gradient(90deg, #00b8d4, #00e5ff)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(0,229,255,0.3), 0 0 20px rgba(0,229,255,0.2)',
+                border: '2px solid rgba(0,229,255,0.6)',
+              },
+              '&:active': {
+                transform: 'translateY(0px)',
+              }
+            }}
+          >
+            Access Dashboard
+          </Button>
+        </form>
+      </Paper>
+    </Box>
+  )
+}

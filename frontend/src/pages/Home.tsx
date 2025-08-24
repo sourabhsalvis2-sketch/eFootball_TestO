@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import apiClient from '../api/config'
 import { Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText, Divider, CircularProgress, Collapse, IconButton, Chip } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
@@ -24,7 +24,7 @@ export default function Home() {
     let mounted = true
     async function load() {
       try {
-        const r = await axios.get('/api/tournaments')
+        const r = await apiClient.get('/api/tournaments')
         if (!mounted) return
         if (Array.isArray(r.data)) {
           setTournaments(r.data)
@@ -52,8 +52,8 @@ export default function Home() {
     setDetails(d => ({ ...d, [tid]: { ...(d[tid] || {}), loading: true } }))
     try {
       const [s, w] = await Promise.all([
-        axios.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null),
-        axios.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null)
+        apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null),
+        apiClient.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null)
       ])
       setDetails(d => ({ ...d, [tid]: { standings: s, winner: w, loading: false } }))
     } catch (e) {

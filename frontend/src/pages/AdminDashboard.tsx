@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import apiClient from '../api/config'
 import { Box, Typography, TextField, Button, Grid, Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material'
 
 export default function AdminDashboard() {
@@ -21,14 +21,14 @@ export default function AdminDashboard() {
   useEffect(() => load(), [])
 
   function load() {
-    axios.get('/api/tournaments').then(r => setTournaments(r.data))
+    apiClient.get('/api/tournaments').then(r => setTournaments(r.data))
   }
 
   async function createTournament() {
   if (!name.trim()) return alert('Enter a tournament name')
   setCreatingTournament(true)
   try {
-    await axios.post('/api/tournaments', { name })
+    await apiClient.post('/api/tournaments', { name })
     setName('')
     load()
   } finally {
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
   if (!playerName.trim()) return alert('Enter a player name')
   setCreatingPlayer(true)
   try {
-    await axios.post('/api/players', { name: playerName })
+    await apiClient.post('/api/players', { name: playerName })
     setPlayerName('')
     load()
   } finally {
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
     if (!selectedTournament) return alert('select a tournament')
     setAddPlayerLoading(true)
     try {
-      await axios.post(`/api/tournaments/${selectedTournament}/players`, { playerId: pid })
+      await apiClient.post(`/api/tournaments/${selectedTournament}/players`, { playerId: pid })
       load()
     } finally {
       setAddPlayerLoading(false)
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
   async function generateMatches(tid: number) {
     setGenerateLoading(true)
     try {
-      await axios.post(`/api/tournaments/${tid}/generate-matches`)
+      await apiClient.post(`/api/tournaments/${tid}/generate-matches`)
       load()
     } finally {
       setGenerateLoading(false)
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
     if (dialogScore1.trim() === '' || dialogScore2.trim() === '' || Number.isNaN(s1) || Number.isNaN(s2)) return alert('enter valid numeric scores')
     setSubmitScoreLoading(true)
     try {
-      const resp = await axios.put(`/api/matches/${currentMatch.id}/score`, { score1: s1, score2: s2 })
+      const resp = await apiClient.put(`/api/matches/${currentMatch.id}/score`, { score1: s1, score2: s2 })
       // if backend returned a winner immediately, show a quick alert
       if (resp?.data?.winner) {
         alert(`Winner: ${resp.data.winner.name}`)
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
   }
 
   async function showStandings(tid: number) {
-    const r = await axios.get(`/api/tournaments/${tid}/standings`)
+    const r = await apiClient.get(`/api/tournaments/${tid}/standings`)
     alert(JSON.stringify(r.data, null, 2))
   }
 

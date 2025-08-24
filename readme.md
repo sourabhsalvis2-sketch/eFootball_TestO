@@ -29,17 +29,9 @@ It includes:
 
 ## 🚀 Quick start (Windows PowerShell)
 
-1. **Start the backend API**
+**Note: This application now connects to a deployed backend server, so you only need to run the frontend locally.**
 
-```powershell
-cd d:/Learning/Efootball/backend
-npm install
-npm start
-```
-
-The backend will run on http://localhost:4000
-
-2. **Start the frontend dev server**
+1. **Start the frontend dev server**
 
 ```powershell
 cd d:/Learning/Efootball/frontend
@@ -47,7 +39,13 @@ npm install
 npm run dev
 ```
 
-The frontend dev server runs on http://localhost:5173 by default and proxies API calls to the backend.
+The frontend dev server runs on http://localhost:5173 and connects to the remote backend at https://efootball-backend-lsv5.onrender.com
+
+2. **Backend API (Already Deployed)**
+
+The backend is deployed and running at: https://efootball-backend-lsv5.onrender.com
+- No need to run it locally
+- All API calls are automatically routed to the remote server
 
 ## 🎯 Build publishable frontend files
 
@@ -60,7 +58,7 @@ npm run build
 
 ## 🔌 Backend endpoints
 
-The backend implements the following REST endpoints with MySQL/SQLite persistence:
+The backend is deployed at https://efootball-backend-lsv5.onrender.com and implements the following REST endpoints with MySQL/SQLite persistence:
 
 - POST `/api/players` — create a new player
 - POST `/api/tournaments` — create a new tournament  

@@ -1,0 +1,460 @@
+body { font-family: Roboto, Arial, sans-serif; margin: 0; }
+a { color: inherit; }
+
+/* Tournament list styles */
+.tournaments-list { display: flex; flex-direction: column; gap: 20px; }
+.tournament-card { padding: 12px; border-radius: 12px; }
+.tournament-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.winner-box { background: linear-gradient(90deg, rgba(76,175,80,0.08), rgba(76,175,80,0.02)); padding: 8px 12px; border-radius: 8px; display: inline-block; }
+
+@media (max-width: 768px) {
+	.tournament-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* Dark, game-themed UI */
+body, html, #root { background: linear-gradient(180deg, #0b0f16 0%, #06070a 100%); color: #e0e0e0; min-height: 100%; }
+
+/* Use Orbitron for headings */
+h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orbitron', 'Roboto Condensed', sans-serif; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+
+/* Fix all text visibility */
+.MuiTypography-root { color: #e0e0e0 !important; }
+.MuiTypography-h6 { color: #bfe9ff !important; font-weight: 600; }
+.MuiTypography-subtitle2 { color: #00e5ff !important; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.MuiTypography-body2 { color: #b0b0b0 !important; }
+
+.tournament-card {
+	background: linear-gradient(135deg, rgba(6,30,60,0.95), rgba(2,8,20,0.98));
+	border: 2px solid rgba(0,200,255,0.15);
+	box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(0,200,255,0.1);
+	transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+	border-radius: 16px;
+	position: relative;
+	overflow: hidden;
+}
+.tournament-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, #00e5ff, #0091ea, #00e5ff);
+	opacity: 0.8;
+}
+.tournament-card:hover {
+	transform: scale(1.03) translateY(-4px);
+	border-color: rgba(0,255,200,0.4);
+	box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,200,0.15);
+}
+
+/* Fix expand button visibility */
+.MuiIconButton-root { 
+	color: #00e5ff !important; 
+	background: rgba(0,229,255,0.1) !important;
+	border: 1px solid rgba(0,229,255,0.3) !important;
+	transition: all 200ms ease !important;
+}
+.MuiIconButton-root:hover { 
+	background: rgba(0,229,255,0.2) !important;
+	transform: scale(1.1) !important;
+	box-shadow: 0 0 20px rgba(0,229,255,0.3) !important;
+}
+
+.tournament-header .MuiTypography-h5 { color: #bfe9ff; }
+.winner-box { background: linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.04)); color: #fff; }
+
+.tournament-card .MuiListItem-root { transition: background 150ms, transform 150ms; }
+.tournament-card .MuiListItem-root:hover { background: rgba(255,255,255,0.03); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+
+/* Buttons and interactive elements */
+.MuiButton-root { 
+	transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+	background: linear-gradient(90deg, rgba(0,229,255,0.1), rgba(0,145,234,0.1)) !important;
+	border: 1px solid rgba(0,229,255,0.3) !important;
+	color: #00e5ff !important;
+	font-weight: 600 !important;
+	border-radius: 8px !important;
+	text-transform: none !important;
+}
+.MuiButton-root:hover { 
+	background: linear-gradient(90deg, rgba(0,229,255,0.2), rgba(0,145,234,0.2)) !important;
+	box-shadow: 0 6px 20px rgba(0,229,255,0.15) !important; 
+	transform: translateY(-2px) !important;
+	border-color: rgba(0,229,255,0.6) !important;
+}
+
+/* Card animations */
+@keyframes card-slide-in {
+	from { opacity: 0; transform: translateY(20px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.tournament-card {
+	animation: card-slide-in 0.6s ease-out;
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+	.tournament-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+	.tournament-card { margin: 0 8px; }
+	.tournaments-list { gap: 16px; padding: 0 8px; }
+	.MuiGrid-container { margin: 0 !important; }
+	.MuiGrid-item { padding: 8px !important; }
+}
+
+/* Loading spinner enhancements */
+.MuiCircularProgress-root { color: #00e5ff !important; }
+
+/* App bar and navigation */
+.MuiAppBar-root { background: linear-gradient(90deg, #0b0f16, #1a2332) !important; }
+.MuiToolbar-root .MuiButton-root { color: #00e5ff !important; }
+
+/* Winner chip and trophy styling */
+.MuiChip-root.MuiChip-colorSuccess { 
+	background: linear-gradient(90deg,#ffd54d,#ffc107) !important; 
+	color: #08121a !important; 
+	font-weight: 700 !important; 
+	text-shadow: 0 1px 0 rgba(255,255,255,0.08) !important;
+	border: 2px solid #ffeb3b !important;
+	box-shadow: 0 4px 16px rgba(255,193,7,0.3) !important;
+	animation: winner-glow 2s ease-in-out infinite alternate !important;
+}
+
+@keyframes winner-glow {
+	from { box-shadow: 0 4px 16px rgba(255,193,7,0.3); }
+	to { box-shadow: 0 6px 24px rgba(255,193,7,0.6); }
+}
+
+/* Trophy icon styling */
+.winner-trophy { 
+	margin-right: 8px; 
+	vertical-align: middle; 
+	color: #ffd700 !important;
+	filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+	animation: trophy-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes trophy-pulse {
+	from { transform: scale(1); }
+	to { transform: scale(1.1); }
+}
+
+/* Match status indicators */
+.match-status-scheduled { background: linear-gradient(90deg, rgba(158,158,158,0.2), rgba(117,117,117,0.1)) !important; border-left: 4px solid #9e9e9e !important; }
+.match-status-completed { background: linear-gradient(90deg, rgba(76,175,80,0.2), rgba(56,142,60,0.1)) !important; border-left: 4px solid #4caf50 !important; }
+.match-status-ongoing { background: linear-gradient(90deg, rgba(255,152,0,0.2), rgba(245,124,0,0.1)) !important; border-left: 4px solid #ff9800 !important; }
+
+/* Enhanced list items */
+.tournament-card .MuiListItem-root { 
+	transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+	border-radius: 8px !important;
+	margin-bottom: 4px !important;
+	border: 1px solid transparent !important;
+}
+.tournament-card .MuiListItem-root:hover { 
+	background: rgba(0,229,255,0.08) !important; 
+	transform: translateX(8px) !important; 
+	border-color: rgba(0,229,255,0.3) !important;
+	box-shadow: 0 4px 16px rgba(0,229,255,0.1) !important;
+}
+
+/* Enhanced text colors for lists */
+.MuiListItemText-primary { color: #ffffff !important; font-weight: 600 !important; }
+.MuiListItemText-secondary { color: #b0bec5 !important; }
+
+/* Accent text */
+.accent-neon { color: #00e5ff; text-shadow: 0 0 6px rgba(0,229,255,0.12); }
+
+/* Subtle transitions */
+.MuiCollapse-root { transition: opacity 240ms ease; }
+
+/* Admin Dashboard Styles - Improved Readability */
+.admin-dashboard {
+	padding: 24px;
+	background: linear-gradient(180deg, #0b0f16 0%, #06070a 100%);
+	min-height: 100vh;
+}
+
+.dashboard-title {
+	color: #ffffff !important;
+	font-family: 'Orbitron', sans-serif !important;
+	font-weight: 700 !important;
+	text-align: center;
+	margin-bottom: 24px !important;
+	text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.section-title {
+	color: #ffffff !important;
+	font-weight: 600 !important;
+	margin-bottom: 16px !important;
+	font-size: 1.25rem !important;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+	background: linear-gradient(135deg, rgba(15,40,70,0.9), rgba(8,20,35,0.95)) !important;
+	border: 1px solid rgba(0,200,255,0.2) !important;
+	border-radius: 12px !important;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+	transition: all 300ms ease !important;
+}
+
+.dashboard-card:hover {
+	border-color: rgba(0,200,255,0.4) !important;
+	box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(0,200,255,0.1) !important;
+}
+
+.card-title {
+	color: #bfe9ff !important;
+	font-weight: 600 !important;
+	margin-bottom: 16px !important;
+}
+
+/* Tournament Admin Cards */
+.tournament-admin-card {
+	background: linear-gradient(135deg, rgba(15,40,70,0.8), rgba(8,20,35,0.9)) !important;
+	border: 1px solid rgba(0,200,255,0.15) !important;
+	border-radius: 12px !important;
+	transition: all 250ms ease !important;
+}
+
+.tournament-admin-card:hover {
+	border-color: rgba(0,200,255,0.3) !important;
+	transform: translateY(-2px) !important;
+}
+
+.tournament-name {
+	color: #ffffff !important;
+	font-weight: 600 !important;
+	font-size: 1.1rem !important;
+}
+
+.tournament-id {
+	color: #90a4ae !important;
+	font-weight: 400 !important;
+	font-size: 0.9rem !important;
+}
+
+.tournament-status {
+	color: #b0bec5 !important;
+	margin: 8px 0 16px 0 !important;
+}
+
+.tournament-actions {
+	margin-bottom: 16px;
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+/* Admin Sections */
+.admin-section {
+	margin-top: 16px !important;
+	padding: 12px 0;
+	border-top: 1px solid rgba(0,200,255,0.1);
+}
+
+.section-subtitle {
+	color: #81c784 !important;
+	font-weight: 700 !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.5px !important;
+	font-size: 0.875rem !important;
+	margin-bottom: 8px !important;
+}
+
+/* Player and Match Lists */
+.players-list, .matches-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.player-item, .match-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	background: rgba(0,200,255,0.05);
+	border: 1px solid rgba(0,200,255,0.1);
+	border-radius: 8px;
+	transition: all 200ms ease;
+}
+
+.player-item:hover, .match-item:hover {
+	background: rgba(0,200,255,0.08);
+	border-color: rgba(0,200,255,0.2);
+	transform: translateX(4px);
+}
+
+.player-name {
+	color: #e0e0e0;
+	font-weight: 500;
+}
+
+.match-details {
+	color: #e0e0e0;
+	font-weight: 400;
+}
+
+.match-round {
+	color: #81c784;
+	font-weight: 600;
+}
+
+.match-players {
+	color: #ffffff;
+	font-weight: 500;
+}
+
+.match-score {
+	color: #ffb74d;
+	font-weight: 600;
+}
+
+/* Buttons - Improved for Readability */
+.dashboard-button, .action-button, .player-action-button, .match-action-button, .standings-button {
+	background: rgba(0,200,255,0.1) !important;
+	border: 1px solid rgba(0,200,255,0.3) !important;
+	color: #ffffff !important;
+	font-weight: 600 !important;
+	text-transform: none !important;
+	border-radius: 6px !important;
+	padding: 6px 16px !important;
+	transition: all 200ms ease !important;
+	font-size: 0.875rem !important;
+}
+
+.dashboard-button:hover, .action-button:hover, .player-action-button:hover, .match-action-button:hover, .standings-button:hover {
+	background: rgba(0,200,255,0.2) !important;
+	border-color: rgba(0,200,255,0.5) !important;
+	box-shadow: 0 2px 8px rgba(0,200,255,0.2) !important;
+	transform: translateY(-1px) !important;
+}
+
+.action-button[aria-pressed="true"], .MuiButton-contained.action-button {
+	background: linear-gradient(90deg, rgba(0,200,255,0.3), rgba(0,145,234,0.3)) !important;
+	border-color: rgba(0,200,255,0.6) !important;
+	color: #ffffff !important;
+}
+
+/* Input Fields */
+.dashboard-input .MuiInputLabel-root {
+	color: #90a4ae !important;
+}
+
+.dashboard-input .MuiInputLabel-root.Mui-focused {
+	color: #00e5ff !important;
+}
+
+.dashboard-input .MuiOutlinedInput-root {
+	color: #ffffff !important;
+}
+
+.dashboard-input .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+	border-color: rgba(0,200,255,0.3) !important;
+}
+
+.dashboard-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+	border-color: rgba(0,200,255,0.5) !important;
+}
+
+.dashboard-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+	border-color: #00e5ff !important;
+}
+
+/* Dialog Styles */
+.score-dialog .MuiDialog-paper {
+	background: linear-gradient(135deg, rgba(15,40,70,0.95), rgba(8,20,35,0.98)) !important;
+	border: 1px solid rgba(0,200,255,0.3) !important;
+	border-radius: 12px !important;
+}
+
+.dialog-title {
+	color: #bfe9ff !important;
+	font-weight: 600 !important;
+	border-bottom: 1px solid rgba(0,200,255,0.2) !important;
+}
+
+.dialog-content {
+	color: #e0e0e0 !important;
+}
+
+.match-info {
+	color: #ffffff !important;
+	font-weight: 500 !important;
+	text-align: center !important;
+}
+
+.score-input .MuiInputLabel-root {
+	color: #90a4ae !important;
+}
+
+.score-input .MuiInputLabel-root.Mui-focused {
+	color: #00e5ff !important;
+}
+
+.score-input .MuiOutlinedInput-root {
+	color: #ffffff !important;
+}
+
+.score-input .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+	border-color: rgba(0,200,255,0.3) !important;
+}
+
+.score-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+	border-color: rgba(0,200,255,0.5) !important;
+}
+
+.score-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+	border-color: #00e5ff !important;
+}
+
+.dialog-actions {
+	border-top: 1px solid rgba(0,200,255,0.2) !important;
+	padding: 16px 24px !important;
+}
+
+.dialog-cancel-button {
+	color: #90a4ae !important;
+	border-color: rgba(144,164,174,0.3) !important;
+}
+
+.dialog-cancel-button:hover {
+	background: rgba(144,164,174,0.1) !important;
+	border-color: rgba(144,164,174,0.5) !important;
+}
+
+.dialog-submit-button {
+	background: linear-gradient(90deg, rgba(0,200,255,0.2), rgba(0,145,234,0.2)) !important;
+	border: 1px solid rgba(0,200,255,0.4) !important;
+	color: #ffffff !important;
+}
+
+.dialog-submit-button:hover {
+	background: linear-gradient(90deg, rgba(0,200,255,0.3), rgba(0,145,234,0.3)) !important;
+	border-color: rgba(0,200,255,0.6) !important;
+}
+
+/* Responsive adjustments for admin dashboard */
+@media (max-width: 768px) {
+	.admin-dashboard {
+		padding: 16px;
+	}
+	
+	.tournament-actions {
+		flex-direction: column;
+	}
+	
+	.player-item, .match-item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+	
+	.player-action-button, .match-action-button {
+		align-self: flex-end;
+	}
+}

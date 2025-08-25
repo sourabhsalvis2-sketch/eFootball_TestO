@@ -21,3 +21,5 @@ build/
 # Editor folders/files
 .vscode/
 .idea/
+
+.next

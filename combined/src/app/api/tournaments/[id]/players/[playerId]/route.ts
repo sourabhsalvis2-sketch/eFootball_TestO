@@ -3,13 +3,14 @@ import { DatabaseService } from '@/lib/db'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; playerId: string } }
+  { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
   try {
-    const tournamentId = parseInt(params.id)
-    const playerId = parseInt(params.playerId)
+    const { id, playerId } = await params
+    const tournamentId = parseInt(id)
+    const playerIdNum = parseInt(playerId)
     
-    if (isNaN(tournamentId) || isNaN(playerId)) {
+    if (isNaN(tournamentId) || isNaN(playerIdNum)) {
       return NextResponse.json(
         { error: 'Invalid tournament ID or player ID' },
         { status: 400 }
@@ -39,7 +40,7 @@ export async function DELETE(
     // Check if player is in the tournament
     const playerInTournament = await DatabaseService.getOne(
       'SELECT * FROM tournament_players WHERE tournament_id = ? AND player_id = ?',
-      [tournamentId, playerId]
+      [tournamentId, playerIdNum]
     )
 
     if (!playerInTournament) {
@@ -49,7 +50,7 @@ export async function DELETE(
       )
     }
 
-    await DatabaseService.removePlayerFromTournament(tournamentId, playerId)
+    await DatabaseService.removePlayerFromTournament(tournamentId, playerIdNum)
     
     return NextResponse.json({ message: 'Player removed from tournament successfully' })
   } catch (error) {

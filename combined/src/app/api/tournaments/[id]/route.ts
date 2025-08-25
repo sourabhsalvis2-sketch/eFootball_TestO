@@ -3,10 +3,11 @@ import { DatabaseService } from '@/lib/db'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const tournamentId = parseInt(params.id)
+    const { id } = await params
+    const tournamentId = parseInt(id)
     
     if (isNaN(tournamentId)) {
       return NextResponse.json(

@@ -215,7 +215,15 @@ export default function Home() {
                           <Typography variant="subtitle2">⚽ Matches</Typography>
                           {Array.isArray(t.matches) && t.matches.length ? (
                             <List dense>
-                              {t.matches.map((m: any) => (
+                              {t.matches.sort((a: any, b: any) => {
+                                // Define round order: final first, then semi, then group
+                                const roundOrder = { final: 0, semi: 1, group: 2 }
+                                const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
+                                const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
+                                if (aOrder !== bOrder) return aOrder - bOrder
+                                // If same round, sort by id
+                                return a.id - b.id
+                              }).map((m: any) => (
                                 <ListItem 
                                   key={m.id} 
                                   className={getMatchStatusClass(m)}

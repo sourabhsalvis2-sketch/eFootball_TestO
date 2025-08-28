@@ -225,7 +225,7 @@ export default function Home() {
                       <Box sx={{ display: 'flex', alignItems: 'center' }}><CircularProgress size={18} /> <Typography sx={{ ml: 1 }}>Loading details...</Typography></Box>
                     ) : (
                       <Grid container spacing={2} sx={{ alignItems: 'flex-start' }}>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={2}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                             🏆 Winner
                           </Typography>
@@ -240,7 +240,7 @@ export default function Home() {
                           </Box>
                         </Grid>
 
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={5}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                             📊 Standings
                           </Typography>
@@ -551,7 +551,7 @@ export default function Home() {
                           )}
                         </Grid>
 
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={5}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>⚽ Matches</Typography>
                           {Array.isArray(t.matches) && t.matches.length ? (
                             <List dense>

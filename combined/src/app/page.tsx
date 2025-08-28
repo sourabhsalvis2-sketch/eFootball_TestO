@@ -2,10 +2,15 @@
 
 import React, { useEffect, useState } from 'react'
 import apiClient from '@/lib/api'
-import { Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText, Divider, CircularProgress, Collapse, IconButton, Chip } from '@mui/material'
+import { 
+  Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText, 
+  Divider, CircularProgress, Collapse, IconButton, Chip,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+} from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import GroupIcon from '@mui/icons-material/Group'
 import StarIcon from '@mui/icons-material/Star'
 import SportsIcon from '@mui/icons-material/Sports'
@@ -85,7 +90,7 @@ export default function Home() {
 
   function getStatusIcon(status: string) {
     switch (status) {
-      case 'completed': return <EmojiEventsIcon sx={{ fontSize: 16, color: '#4caf50' }} />
+      case 'completed': return <CheckCircleIcon sx={{ fontSize: 16, color: '#4caf50' }} />
       case 'in_progress': return <SportsIcon sx={{ fontSize: 16, color: '#ff9800' }} />
       case 'pending': return <StarIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />
       default: return <StarIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />
@@ -96,10 +101,7 @@ export default function Home() {
     <div>
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Typography variant="h3" sx={{ fontFamily: 'Orbitron', fontWeight: 700, color: '#00e5ff', textShadow: '0 0 20px rgba(0,229,255,0.5)' }}>
-          ⚽ eFootball Dashboard
-        </Typography>
-        <Typography variant="h6" sx={{ color: '#b0bec5', mt: 1 }}>
-          Tournament Management System
+          ⚽ eFootball Gadhinglaj
         </Typography>
       </Box>
       {loadError && <Typography color="error">{loadError}</Typography>}
@@ -112,29 +114,54 @@ export default function Home() {
           return (
             <Card key={t.id} className="tournament-card" elevation={6}>
               <CardContent>
-                <Box className="tournament-header">
-                  <Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <SportsSoccerIcon sx={{ color: 'rgba(0,200,255,0.9)', fontSize: 24 }} />
-                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#ffffff' }}>{t.name}</Typography>
+                <Box className="tournament-header" sx={{ 
+                  display: 'flex', 
+                  flexDirection: { xs: 'column', sm: 'row' }, 
+                  alignItems: { xs: 'flex-start', sm: 'center' }, 
+                  justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                  gap: { xs: 2, sm: 2 },
+                  mb: 2 
+                }}>
+                  {/* Left section - Tournament info */}
+                  <Box sx={{ flexShrink: 0, minWidth: 0, maxWidth: { xs: '100%', sm: '250px' } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <SportsSoccerIcon sx={{ color: 'rgba(0,200,255,0.9)', fontSize: { xs: 20, sm: 24 } }} />
+                      <Typography variant="h5" sx={{ 
+                        fontWeight: 700, 
+                        color: '#ffffff', 
+                        fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                        wordBreak: 'break-word'
+                      }}>
+                        {t.name}
+                      </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
                       {getStatusIcon(t.status)}
-                      <Typography variant="body2" sx={{ color: '#b0bec5' }}>
+                      <Typography variant="body2" sx={{ color: '#b0bec5', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                         Status: <span style={{ color: '#00e5ff', fontWeight: 600 }}>{t.status.toUpperCase()}</span>
                       </Typography>
                     </Box>
                   </Box>
                   
-                  {/* Winner section in the middle */}
-                  <Box sx={{ textAlign: 'center', flex: 1, mx: 2 }}>
-                    {det.winner ? (
-                      <Box>
-                        <EmojiEventsIcon sx={{ color: '#ffd700', fontSize: 24, mb: 0.5 }} />
-                        <Typography variant="h6" sx={{ color: '#ffd700', fontWeight: 700 }}>
-                          Champion
-                        </Typography>
-                        <Typography variant="h5" sx={{ color: '#ffffff', fontWeight: 600 }}>
+                  {/* Center section - Winner (hidden when expanded) */}
+                  {!details[t.id]?.expanded && (
+                    <Box sx={{ 
+                      textAlign: 'center', 
+                      flexGrow: 1,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      maxWidth: { xs: '100%', sm: '280px' },
+                      minHeight: { xs: '60px', sm: '80px' },
+                      order: { xs: 2, sm: 0 }
+                    }}>
+                      {det.winner ? (
+                        <Box>
+                          <EmojiEventsIcon sx={{ color: '#ffd700', fontSize: { xs: 24, sm: 28 }, mb: 0.5 }} />
+                          <Typography variant="h6" sx={{ color: '#ffd700', fontWeight: 700, mb: 0.25, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                            Champion
+                          </Typography>
+                        <Typography variant="h5" sx={{ color: '#ffffff', fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                           {det.winner.name}
                         </Typography>
                       </Box>
@@ -146,19 +173,48 @@ export default function Home() {
                         </Typography>
                       </Box>
                     )}
-                  </Box>
+                    </Box>
+                  )}
                   
-                  <Box sx={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {/* Right section - Players and Expand */}
+                  <Box sx={{ 
+                    textAlign: 'center', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    gap: 2,
+                    flexShrink: 0,
+                    order: { xs: 3, sm: 0 }
+                  }}>
                     <Box sx={{ textAlign: 'center' }}>
-                      <GroupIcon sx={{ color: '#00e5ff', fontSize: 20 }} />
-                      <Typography variant="h6" sx={{ color: '#ffffff' }}>Players</Typography>
-                      <Typography variant="h4" sx={{ color: '#00e5ff', fontWeight: 700 }}>{t.players?.length ?? 0}</Typography>
+                      <GroupIcon sx={{ color: '#00e5ff', fontSize: { xs: 18, sm: 20 } }} />
+                      <Typography variant="h6" sx={{ 
+                        color: '#ffffff', 
+                        fontSize: { xs: '0.875rem', sm: '1.25rem' } 
+                      }}>
+                        Players
+                      </Typography>
+                      <Typography variant="h4" sx={{ 
+                        color: '#00e5ff', 
+                        fontWeight: 700,
+                        fontSize: { xs: '1.5rem', sm: '2.125rem' }
+                      }}>
+                        {t.players?.length ?? 0}
+                      </Typography>
                     </Box>
                     <IconButton
                       onClick={() => setDetails(d => ({ ...d, [t.id]: { ...(d[t.id] || {}), expanded: !d[t.id]?.expanded } }))}
                       aria-label="expand"
+                      sx={{ 
+                        color: '#00e5ff',
+                        '&:hover': { backgroundColor: 'rgba(0,229,255,0.1)' }
+                      }}
                     >
-                      <ExpandMoreIcon sx={{ transform: details[t.id]?.expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 300ms' }} />
+                      <ExpandMoreIcon sx={{ 
+                        transform: details[t.id]?.expanded ? 'rotate(180deg)' : 'rotate(0deg)', 
+                        transition: 'transform 300ms',
+                        fontSize: { xs: 24, sm: 28 }
+                      }} />
                     </IconButton>
                   </Box>
                 </Box>
@@ -168,14 +224,15 @@ export default function Home() {
                     {det.loading ? (
                       <Box sx={{ display: 'flex', alignItems: 'center' }}><CircularProgress size={18} /> <Typography sx={{ ml: 1 }}>Loading details...</Typography></Box>
                     ) : (
-                      <Grid container spacing={2}>
+                      <Grid container spacing={2} sx={{ alignItems: 'flex-start' }}>
                         <Grid item xs={12} md={4}>
-                          <Typography variant="subtitle2">🏆 Winner</Typography>
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                            🏆 Winner
+                          </Typography>
                           <Box className="winner-box">
                             {det.winner ? (
                               <>
-                                <EmojiEventsIcon className="winner-trophy" />
-                                <Chip label={det.winner.name} color="success" />
+                                <Chip label={det.winner.name} color="success" sx={{ fontWeight: 600, fontSize: '1rem' }} />
                               </>
                             ) : (
                               <Typography sx={{ color: '#b0bec5' }}>TBD</Typography>
@@ -184,35 +241,318 @@ export default function Home() {
                         </Grid>
 
                         <Grid item xs={12} md={4}>
-                          <Typography variant="subtitle2">📊 Standings</Typography>
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                            📊 Standings
+                          </Typography>
                           {det.standings && det.standings.length ? (
-                            <List dense>
-                              {det.standings.map((s, index) => (
-                                <ListItem key={s.playerId} sx={{ 
-                                  background: index === 0 ? 'linear-gradient(90deg, rgba(255,215,0,0.1), rgba(255,193,7,0.05))' : 'transparent',
-                                  border: index === 0 ? '1px solid rgba(255,215,0,0.3)' : '1px solid transparent'
-                                }}>
-                                  <ListItemText 
-                                    primary={
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {index === 0 && <EmojiEventsIcon sx={{ color: '#ffd700', fontSize: 16 }} />}
-                                        <span style={{ fontWeight: index < 3 ? 700 : 400 }}>
-                                          #{index + 1} {s.name}
-                                        </span>
-                                      </Box>
-                                    }
-                                    secondary={`${s.points} pts — Goals Scored ${s.goalsFor} / Goals Conceeded ${s.goalsAgainst} / Goals Difference ${s.goalDiff}`} 
-                                  />
-                                </ListItem>
-                              ))}
-                            </List>
+                            <TableContainer 
+                              component={Paper} 
+                              sx={{ 
+                                background: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(13,27,42,0.95) 100%)',
+                                border: '1px solid rgba(0,229,255,0.3)',
+                                borderRadius: 2,
+                                boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
+                                maxHeight: { xs: 300, sm: 400 },
+                                overflow: 'auto',
+                                '&::-webkit-scrollbar': {
+                                  width: '6px',
+                                },
+                                '&::-webkit-scrollbar-track': {
+                                  background: 'rgba(0,0,0,0.1)',
+                                },
+                                '&::-webkit-scrollbar-thumb': {
+                                  background: 'rgba(0,229,255,0.3)',
+                                  borderRadius: '3px',
+                                },
+                              }}
+                            >
+                              <Table size="small" stickyHeader>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell 
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      #
+                                    </TableCell>
+                                    <TableCell 
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      Player
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      Pts
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      P
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      W
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      D
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      L
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      GS
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      GC
+                                    </TableCell>
+                                    <TableCell 
+                                      align="center"
+                                      sx={{ 
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+                                        color: '#00e5ff',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
+                                        padding: { xs: '6px 2px', sm: '8px 4px' }
+                                      }}
+                                    >
+                                      GD
+                                    </TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {det.standings.map((s, index) => (
+                                    <TableRow 
+                                      key={s.playerId}
+                                      sx={{
+                                        background: index === 0 
+                                          ? 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.08) 100%)'
+                                          : index === 1
+                                          ? 'linear-gradient(90deg, rgba(224,224,224,0.12) 0%, rgba(192,192,192,0.06) 100%)'
+                                          : index === 2
+                                          ? 'linear-gradient(90deg, rgba(205,127,50,0.1) 0%, rgba(184,115,51,0.05) 100%)'
+                                          : 'transparent',
+                                        border: index === 0 
+                                          ? '1px solid rgba(255,215,0,0.4)' 
+                                          : index === 1
+                                          ? '1px solid rgba(224,224,224,0.3)'
+                                          : '1px solid transparent',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                          background: 'rgba(0,229,255,0.08)',
+                                          transform: 'translateX(4px)',
+                                          boxShadow: '4px 0 12px rgba(0,229,255,0.2)',
+                                        }
+                                      }}
+                                    >
+                                      <TableCell 
+                                        sx={{ 
+                                          color: index === 0 ? '#ffd700' : index === 1 ? '#e0e0e0' : index === 2 ? '#cd7f32' : '#ffffff',
+                                          fontWeight: index < 3 ? 700 : 400,
+                                          fontSize: '0.875rem',
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {index + 1}
+                                      </TableCell>
+                                      <TableCell 
+                                        sx={{ 
+                                          color: '#ffffff',
+                                          fontWeight: index < 3 ? 700 : 500,
+                                          fontSize: '0.875rem',
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.name}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#00e5ff',
+                                          fontWeight: 700,
+                                          fontSize: '0.875rem',
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.points}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#b0bec5',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.played}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#4caf50',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 600,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.wins}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#ff9800',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 600,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.draws}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#f44336',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 600,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.losses}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#81c784',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 600,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.goalsFor}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: '#e57373',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 600,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.goalsAgainst}
+                                      </TableCell>
+                                      <TableCell 
+                                        align="center"
+                                        sx={{ 
+                                          color: s.goalDiff >= 0 ? '#4caf50' : '#f44336',
+                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                          fontWeight: 700,
+                                          padding: { xs: '4px 2px', sm: '6px 4px' },
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                        }}
+                                      >
+                                        {s.goalDiff >= 0 ? '+' : ''}{s.goalDiff}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
                           ) : (
                             <Typography variant="body2" sx={{ color: '#b0bec5' }}>No standings yet</Typography>
                           )}
                         </Grid>
 
                         <Grid item xs={12} md={4}>
-                          <Typography variant="subtitle2">⚽ Matches</Typography>
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>⚽ Matches</Typography>
                           {Array.isArray(t.matches) && t.matches.length ? (
                             <List dense>
                               {t.matches.sort((a: any, b: any) => {

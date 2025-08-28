@@ -96,11 +96,62 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orb
 
 /* Responsive design improvements */
 @media (max-width: 768px) {
-	.tournament-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-	.tournament-card { margin: 0 8px; }
-	.tournaments-list { gap: 16px; padding: 0 8px; }
-	.MuiGrid-container { margin: 0 !important; }
-	.MuiGrid-item { padding: 8px !important; }
+	.tournament-header { 
+		flex-direction: column !important; 
+		align-items: flex-start !important; 
+		gap: 12px !important; 
+	}
+	.tournament-card { 
+		margin: 0 8px; 
+		padding: 16px !important;
+	}
+	.tournaments-list { 
+		gap: 16px; 
+		padding: 0 8px; 
+	}
+	.MuiGrid-container { 
+		margin: 0 !important; 
+		gap: 8px !important;
+	}
+	.MuiGrid-item { 
+		padding: 8px !important; 
+	}
+	
+	/* Winner section adjustments for mobile */
+	.winner-section {
+		text-align: center !important;
+		width: 100% !important;
+		margin: 12px 0 !important;
+		order: 2 !important;
+	}
+	
+	/* Player count adjustments for mobile */
+	.player-count-section {
+		width: 100% !important;
+		justify-content: space-between !important;
+		order: 3 !important;
+	}
+	
+	/* Standings table mobile optimizations */
+	.MuiTableContainer-root {
+		font-size: 0.7rem !important;
+		max-height: 250px !important;
+	}
+	
+	.MuiTable-root .MuiTableCell-root {
+		padding: 4px 1px !important;
+		font-size: 0.6rem !important;
+	}
+	
+	/* Match list mobile spacing */
+	.MuiList-root.MuiList-dense {
+		padding: 4px 0 !important;
+	}
+	
+	.MuiListItem-root {
+		padding: 4px 8px !important;
+		font-size: 0.8rem !important;
+	}
 }
 
 /* Loading spinner enhancements */

@@ -264,6 +264,7 @@ export default function AdminDashboard() {
                   >
                     {selectedTournament === t.id ? "Selected" : "Select"}
                   </Button>
+                  {t.status!='completed' &&
                   <Button 
                     onClick={() => generateMatches(t.id)} 
                     disabled={generateLoading}
@@ -273,6 +274,7 @@ export default function AdminDashboard() {
                   >
                     {generateLoading ? <><CircularProgress size={14} sx={{ mr: 1 }} />Generating</> : 'Generate Matches'}
                   </Button>
+                  }
                   <Button 
                     onClick={() => deleteTournament(t.id, t.name)} 
                     className="action-button"

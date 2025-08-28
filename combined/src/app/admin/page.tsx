@@ -2,21 +2,42 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { TextField, Button, Box, Typography, Paper } from '@mui/material'
+import { TextField, Button, Box, Typography, Paper, CircularProgress, Alert } from '@mui/material'
 import SecurityIcon from '@mui/icons-material/Security'
 import LoginIcon from '@mui/icons-material/Login'
 
 export default function AdminLogin() {
   const [user, setUser] = useState('')
   const [pass, setPass] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const router = useRouter()
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (user === 'admin' && pass === 'admin123') {
-      router.push('/admin/dashboard')
-    } else {
-      alert('invalid')
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: user, password: pass })
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        router.push('/admin/dashboard')
+      } else {
+        setError(data.error || 'Invalid credentials')
+      }
+    } catch (error) {
+      setError('Authentication failed. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -80,6 +101,22 @@ export default function AdminLogin() {
         </Box>
         
         <form onSubmit={submit}>
+          {error && (
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3,
+                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                border: '1px solid rgba(244, 67, 54, 0.3)',
+                color: '#ffffff',
+                '& .MuiAlert-icon': {
+                  color: '#f44336'
+                }
+              }}
+            >
+              {error}
+            </Alert>
+          )}
           <TextField 
             fullWidth 
             label="Username" 
@@ -159,29 +196,34 @@ export default function AdminLogin() {
             variant="contained" 
             type="submit" 
             fullWidth
-            startIcon={<LoginIcon />}
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
             sx={{
               py: 1.5,
               fontSize: '1.1rem',
               fontWeight: 700,
-              background: 'linear-gradient(90deg, #00e5ff, #0091ea)',
+              background: loading ? 'rgba(0,229,255,0.5)' : 'linear-gradient(90deg, #00e5ff, #0091ea)',
               color: '#0b0f16',
               border: '2px solid transparent',
               borderRadius: '8px',
               textTransform: 'none',
               transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                background: 'linear-gradient(90deg, #00b8d4, #00e5ff)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(0,229,255,0.3), 0 0 20px rgba(0,229,255,0.2)',
-                border: '2px solid rgba(0,229,255,0.6)',
+                background: loading ? 'rgba(0,229,255,0.5)' : 'linear-gradient(90deg, #00b8d4, #00e5ff)',
+                transform: loading ? 'none' : 'translateY(-2px)',
+                boxShadow: loading ? 'none' : '0 8px 25px rgba(0,229,255,0.3), 0 0 20px rgba(0,229,255,0.2)',
+                border: loading ? '2px solid transparent' : '2px solid rgba(0,229,255,0.6)',
               },
               '&:active': {
-                transform: 'translateY(0px)',
+                transform: loading ? 'none' : 'translateY(0px)',
+              },
+              '&.Mui-disabled': {
+                color: '#0b0f16',
+                opacity: 0.7,
               }
             }}
           >
-            Access Dashboard
+            {loading ? 'Authenticating...' : 'Access Dashboard'}
           </Button>
         </form>
       </Paper>

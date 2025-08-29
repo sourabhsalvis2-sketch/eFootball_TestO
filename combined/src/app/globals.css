@@ -31,6 +31,7 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orb
 	border-radius: 16px;
 	position: relative;
 	overflow: hidden;
+	z-index: 1;
 }
 .tournament-card::before {
 	content: '';
@@ -43,9 +44,10 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orb
 	opacity: 0.8;
 }
 .tournament-card:hover {
-	transform: scale(1.03) translateY(-4px);
+	transform: scale(1.01) translateY(-1px);
 	border-color: rgba(0,255,200,0.4);
 	box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,200,0.15);
+	z-index: 2;
 }
 
 /* Fix expand button visibility */
@@ -94,6 +96,42 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orb
 	animation: card-slide-in 0.6s ease-out;
 }
 
+/* Standings table styling - Let React component handle colors */
+.MuiTableContainer-root {
+	max-height: none !important;
+	overflow-x: auto !important;
+	overflow-y: visible !important;
+	width: 100% !important;
+}
+
+.MuiTable-root {
+	background: transparent !important;
+	width: 100% !important;
+	table-layout: auto !important;
+}
+
+/* Only override padding and text handling for responsiveness */
+.MuiTable-root .MuiTableCell-root {
+	white-space: nowrap !important;
+	overflow: hidden !important;
+	text-overflow: ellipsis !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+	background: rgba(0,200,255,0.08) !important;
+	color: #bfe9ff !important;
+	font-weight: 700 !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.5px !important;
+	border-bottom: 2px solid rgba(0,200,255,0.3) !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+	background: rgba(0,200,255,0.05) !important;
+	transform: translateY(-1px) !important;
+	transition: all 150ms ease !important;
+}
+
 /* Responsive design improvements */
 @media (max-width: 768px) {
 	.tournament-header { 
@@ -132,15 +170,18 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 { font-family: 'Orb
 		order: 3 !important;
 	}
 	
-	/* Standings table mobile optimizations */
+	/* Standings table mobile optimizations - Minimal override */
 	.MuiTableContainer-root {
-		font-size: 0.7rem !important;
-		max-height: 250px !important;
+		max-height: none !important;
+		overflow-x: auto !important;
+		overflow-y: visible !important;
+		width: 100% !important;
+		margin: 0 !important;
 	}
 	
-	.MuiTable-root .MuiTableCell-root {
-		padding: 4px 1px !important;
-		font-size: 0.6rem !important;
+	.MuiTable-root {
+		width: 100% !important;
+		min-width: 320px !important;
 	}
 	
 	/* Match list mobile spacing */

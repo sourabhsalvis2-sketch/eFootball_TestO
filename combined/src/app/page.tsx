@@ -99,7 +99,7 @@ export default function Home() {
 
   return (
     <div>
-      <Box sx={{ textAlign: 'center', mb: 4 }}>
+      <Box sx={{ textAlign: 'center', mb: 4, position: 'relative', zIndex: 10 }}>
         <Typography variant="h3" sx={{ fontFamily: 'Orbitron', fontWeight: 700, color: '#00e5ff', textShadow: '0 0 20px rgba(0,229,255,0.5)' }}>
           ⚽ eFootball Gadhinglaj
         </Typography>

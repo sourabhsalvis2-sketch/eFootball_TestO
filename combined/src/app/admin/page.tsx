@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TextField, Button, Box, Typography, Paper, CircularProgress, Alert } from '@mui/material'
 import SecurityIcon from '@mui/icons-material/Security'
@@ -11,7 +11,29 @@ export default function AdminLogin() {
   const [pass, setPass] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [checkingAuth, setCheckingAuth] = useState(true)
   const router = useRouter()
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    checkAuthentication()
+  }, [])
+
+  const checkAuthentication = async () => {
+    try {
+      const response = await fetch('/api/admin/session')
+      const data = await response.json()
+      
+      if (response.ok && data.authenticated) {
+        // User is already authenticated, redirect to dashboard
+        router.push('/admin/dashboard')
+      }
+    } catch (error) {
+      // Not authenticated, which is fine for login page
+    } finally {
+      setCheckingAuth(false)
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,6 +61,27 @@ export default function AdminLogin() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show loading while checking authentication
+  if (checkingAuth) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '80vh',
+          flexDirection: 'column',
+          gap: 2
+        }}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="h6" sx={{ color: '#b0bec5' }}>
+          Checking authentication...
+        </Typography>
+      </Box>
+    )
   }
 
   return (

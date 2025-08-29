@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (username === adminUsername && password === adminPassword) {
-      return NextResponse.json({ success: true })
+      // Create a simple session token
+      const sessionToken = Buffer.from(`${username}:${Date.now()}`).toString('base64')
+      
+      // Set httpOnly cookie
+      const response = NextResponse.json({ success: true })
+      response.cookies.set('admin-session', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/'
+      })
+      
+      return response
     } else {
       return NextResponse.json(
         { error: 'Invalid credentials' },

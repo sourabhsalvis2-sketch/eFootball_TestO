@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import apiClient from '@/lib/api'
 import { Box, Typography, TextField, Button, Grid, Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material'
+import { useAdminAuth } from '@/hooks/useAdminAuth'
 
 export default function AdminDashboard() {
+  const { isAuthenticated, isLoading, logout } = useAdminAuth()
   const [tournaments, setTournaments] = useState<any[]>([])
   const [allPlayers, setAllPlayers] = useState<any[]>([])
   const [name, setName] = useState('')
@@ -163,9 +165,67 @@ export default function AdminDashboard() {
     alert(JSON.stringify(r.data, null, 2))
   }
 
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '50vh',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <CircularProgress size={40} />
+        <Typography variant="h6" sx={{ color: '#b0bec5' }}>
+          Verifying access...
+        </Typography>
+      </Box>
+    )
+  }
+
+  // If not authenticated, the hook will redirect to /admin
+  // This is just a fallback in case the redirect fails
+  if (!isAuthenticated) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '50vh',
+        flexDirection: 'column',
+        gap: 2
+      }}>
+        <Typography variant="h6" sx={{ color: '#f44336' }}>
+          Access Denied
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#b0bec5' }}>
+          Redirecting to login...
+        </Typography>
+      </Box>
+    )
+  }
+
   return (
     <Box className="admin-dashboard">
-      <Typography variant="h4" className="dashboard-title">Admin Dashboard</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4" className="dashboard-title">Admin Dashboard</Typography>
+        <Button 
+          variant="outlined" 
+          color="error" 
+          onClick={logout}
+          sx={{ 
+            borderColor: '#f44336',
+            color: '#f44336',
+            '&:hover': {
+              borderColor: '#d32f2f',
+              backgroundColor: 'rgba(244, 67, 54, 0.1)'
+            }
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item xs={12} md={4}>

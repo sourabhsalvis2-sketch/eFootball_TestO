@@ -14,6 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import GroupIcon from '@mui/icons-material/Group'
 import StarIcon from '@mui/icons-material/Star'
 import SportsIcon from '@mui/icons-material/Sports'
+import styles from './page.module.css'
 
 type Details = {
   standings?: any[] | null
@@ -99,8 +100,8 @@ export default function Home() {
 
   return (
     <div>
-      <Box sx={{ textAlign: 'center', mb: 4, position: 'relative', zIndex: 10 }}>
-        <Typography variant="h3" sx={{ fontFamily: 'Orbitron', fontWeight: 700, color: '#00e5ff', textShadow: '0 0 20px rgba(0,229,255,0.5)' }}>
+      <Box className={styles.pageHeader}>
+        <Typography variant="h3" className={styles.mainTitle}>
           ⚽ eFootball Gadhinglaj
         </Typography>
       </Box>
@@ -114,30 +115,18 @@ export default function Home() {
           return (
             <Card key={t.id} className="tournament-card" elevation={6}>
               <CardContent>
-                <Box className="tournament-header" sx={{ 
-                  display: 'flex', 
-                  flexDirection: { xs: 'column', sm: 'row' }, 
-                  alignItems: { xs: 'flex-start', sm: 'center' }, 
-                  justifyContent: { xs: 'flex-start', sm: 'space-between' },
-                  gap: { xs: 2, sm: 2 },
-                  mb: 2 
-                }}>
+                <Box className={styles.tournamentHeader}>
                   {/* Left section - Tournament info */}
-                  <Box sx={{ flexShrink: 0, minWidth: 0, maxWidth: { xs: '100%', sm: '250px' } }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <SportsSoccerIcon sx={{ color: 'rgba(0,200,255,0.9)', fontSize: { xs: 20, sm: 24 } }} />
-                      <Typography variant="h5" sx={{ 
-                        fontWeight: 700, 
-                        color: '#ffffff', 
-                        fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                        wordBreak: 'break-word'
-                      }}>
+                  <Box className={styles.tournamentInfo}>
+                    <Box className={styles.tournamentTitleSection}>
+                      <SportsSoccerIcon className={styles.soccerIconSmall} />
+                      <Typography variant="h5" className={styles.tournamentTitle}>
                         {t.name}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
+                    <Box className={styles.tournamentStatusSection}>
                       {getStatusIcon(t.status)}
-                      <Typography variant="body2" sx={{ color: '#b0bec5', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                      <Typography variant="body2" className={styles.statusText}>
                         Status: <span style={{ color: '#00e5ff', fontWeight: 600 }}>{t.status.toUpperCase()}</span>
                       </Typography>
                     </Box>
@@ -145,23 +134,14 @@ export default function Home() {
                   
                   {/* Center section - Winner (hidden when expanded) */}
                   {!details[t.id]?.expanded && (
-                    <Box sx={{ 
-                      textAlign: 'center', 
-                      flexGrow: 1,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      maxWidth: { xs: '100%', sm: '280px' },
-                      minHeight: { xs: '60px', sm: '80px' },
-                      order: { xs: 2, sm: 0 }
-                    }}>
+                    <Box className={styles.winnerSection}>
                       {det.winner ? (
                         <Box>
-                          <EmojiEventsIcon sx={{ color: '#ffd700', fontSize: { xs: 24, sm: 28 }, mb: 0.5 }} />
-                          <Typography variant="h6" sx={{ color: '#ffd700', fontWeight: 700, mb: 0.25, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                          <EmojiEventsIcon className={styles.trophyIcon} />
+                          <Typography variant="h6" className={styles.championTitle}>
                             Champion
                           </Typography>
-                        <Typography variant="h5" sx={{ color: '#ffffff', fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+                        <Typography variant="h5" className={styles.championName}>
                           {det.winner.name}
                         </Typography>
                       </Box>

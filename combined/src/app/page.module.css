@@ -1,0 +1,544 @@
+/* ===========================================
+   HOME PAGE STYLES MODULE
+   =========================================== */
+
+/* Header Section */
+.pageHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 600px) {
+  .pageHeader {
+    margin-bottom: 2.5rem;
+  }
+}
+
+@media (min-width: 960px) {
+  .pageHeader {
+    margin-bottom: 3rem;
+  }
+}
+
+.mainTitle {
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 20px rgba(0,229,255,0.5) !important;
+  font-size: 2rem !important;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem !important;
+}
+
+@media (min-width: 600px) {
+  .mainTitle {
+    font-size: 2.5rem !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .mainTitle {
+    font-size: 3rem !important;
+  }
+}
+
+/* Tournament Card Header Layout */
+.tournamentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 599px) {
+  .tournamentHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+/* Tournament Info Section */
+.tournamentInfo {
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (min-width: 600px) {
+  .tournamentInfo {
+    max-width: 250px;
+  }
+}
+
+.tournamentTitleSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.soccerIconSmall {
+  color: rgba(0,200,255,0.9) !important;
+  font-size: 1.25rem !important;
+}
+
+@media (min-width: 600px) {
+  .soccerIconSmall {
+    font-size: 1.5rem !important;
+  }
+}
+
+.tournamentTitle {
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  font-size: 1.25rem !important;
+  word-break: break-word;
+}
+
+@media (min-width: 600px) {
+  .tournamentTitle {
+    font-size: 1.5rem !important;
+  }
+}
+
+.tournamentStatusSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.statusText {
+  color: #b0bec5 !important;
+  font-size: 0.75rem !important;
+}
+
+@media (min-width: 600px) {
+  .statusText {
+    font-size: 0.875rem !important;
+  }
+}
+
+.statusHighlight {
+  color: #00e5ff;
+  font-weight: 600;
+}
+
+/* Winner Section */
+.winnerSection {
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  min-height: 60px;
+  order: 2;
+}
+
+@media (min-width: 600px) {
+  .winnerSection {
+    max-width: 280px;
+    min-height: 80px;
+    order: 0;
+  }
+}
+
+.trophyIcon {
+  color: #ffd700 !important;
+  font-size: 1.5rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+@media (min-width: 600px) {
+  .trophyIcon {
+    font-size: 1.75rem !important;
+  }
+}
+
+.championTitle {
+  color: #ffd700 !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.125rem !important;
+  font-size: 1rem !important;
+}
+
+@media (min-width: 600px) {
+  .championTitle {
+    font-size: 1.25rem !important;
+  }
+}
+
+.championName {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+}
+
+@media (min-width: 600px) {
+  .championName {
+    font-size: 1.5rem !important;
+  }
+}
+
+.noWinnerIcon {
+  color: #666 !important;
+  font-size: 1.5rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.noWinnerText {
+  color: #b0bec5 !important;
+}
+
+/* Players and Controls Section */
+.playersControlsSection {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  order: 3;
+}
+
+@media (min-width: 600px) {
+  .playersControlsSection {
+    order: 0;
+  }
+}
+
+.playersBox {
+  text-align: center;
+}
+
+.playersIcon {
+  color: #00e5ff !important;
+  font-size: 1.125rem !important;
+}
+
+@media (min-width: 600px) {
+  .playersIcon {
+    font-size: 1.25rem !important;
+  }
+}
+
+.playersLabel {
+  color: #ffffff !important;
+  font-size: 0.875rem !important;
+}
+
+@media (min-width: 600px) {
+  .playersLabel {
+    font-size: 1.25rem !important;
+  }
+}
+
+.playersCount {
+  color: #00e5ff !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+}
+
+@media (min-width: 600px) {
+  .playersCount {
+    font-size: 2.125rem !important;
+  }
+}
+
+.expandButton {
+  color: #00e5ff !important;
+}
+
+.expandButton:hover {
+  background-color: rgba(0,229,255,0.1) !important;
+}
+
+.expandIcon {
+  transition: transform 300ms;
+  font-size: 1.5rem !important;
+}
+
+@media (min-width: 600px) {
+  .expandIcon {
+    font-size: 1.75rem !important;
+  }
+}
+
+.expandIconRotated {
+  transform: rotate(180deg);
+}
+
+/* Expanded Content */
+.expandedContent {
+  margin-top: 1rem;
+}
+
+.loadingContent {
+  display: flex;
+  align-items: center;
+}
+
+.loadingText {
+  margin-left: 0.5rem !important;
+}
+
+.expandedGrid {
+  align-items: flex-start;
+}
+
+/* Section Titles */
+.sectionTitle {
+  margin-bottom: 0.5rem !important;
+  font-size: 0.875rem !important;
+}
+
+@media (min-width: 600px) {
+  .sectionTitle {
+    font-size: 1rem !important;
+  }
+}
+
+.noDataText {
+  color: #b0bec5 !important;
+}
+
+/* Standings Table Container */
+.standingsTableContainer {
+  background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(13,27,42,0.95) 100%) !important;
+  border: 1px solid rgba(0,229,255,0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0,229,255,0.15) !important;
+  max-height: 300px !important;
+  overflow: auto !important;
+}
+
+@media (min-width: 600px) {
+  .standingsTableContainer {
+    max-height: 400px !important;
+  }
+}
+
+.standingsTableContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.standingsTableContainer::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+}
+
+.standingsTableContainer::-webkit-scrollbar-thumb {
+  background: rgba(0,229,255,0.3);
+  border-radius: 3px;
+}
+
+/* Table Header Cells */
+.tableHeaderCell {
+  background: linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%) !important;
+  color: #00e5ff !important;
+  font-weight: 700 !important;
+  font-size: 0.6rem !important;
+  border-bottom: 2px solid rgba(0,229,255,0.3) !important;
+  padding: 6px 2px !important;
+}
+
+@media (min-width: 600px) {
+  .tableHeaderCell {
+    font-size: 0.75rem !important;
+    padding: 8px 4px !important;
+  }
+}
+
+/* Table Body Rows */
+.tableRowFirst {
+  background: linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.08) 100%) !important;
+  border: 1px solid rgba(255,215,0,0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+.tableRowSecond {
+  background: linear-gradient(90deg, rgba(224,224,224,0.12) 0%, rgba(192,192,192,0.06) 100%) !important;
+  border: 1px solid rgba(224,224,224,0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.tableRowThird {
+  background: linear-gradient(90deg, rgba(205,127,50,0.1) 0%, rgba(184,115,51,0.05) 100%) !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.tableRowOther {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.tableRowFirst:hover,
+.tableRowSecond:hover,
+.tableRowThird:hover,
+.tableRowOther:hover {
+  background: rgba(0,229,255,0.08) !important;
+  transform: translateX(4px) !important;
+  box-shadow: 4px 0 12px rgba(0,229,255,0.2) !important;
+}
+
+/* Table Cells */
+.tableCellPosition {
+  font-size: 0.875rem !important;
+  padding: 4px 2px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+@media (min-width: 600px) {
+  .tableCellPosition {
+    padding: 6px 4px !important;
+  }
+}
+
+.tableCellPositionFirst {
+  color: #ffd700 !important;
+  font-weight: 700 !important;
+}
+
+.tableCellPositionSecond {
+  color: #e0e0e0 !important;
+  font-weight: 700 !important;
+}
+
+.tableCellPositionThird {
+  color: #cd7f32 !important;
+  font-weight: 700 !important;
+}
+
+.tableCellPositionOther {
+  color: #ffffff !important;
+  font-weight: 400 !important;
+}
+
+.tableCellPlayer {
+  color: #ffffff !important;
+  font-size: 0.875rem !important;
+  padding: 4px 2px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+@media (min-width: 600px) {
+  .tableCellPlayer {
+    padding: 6px 4px !important;
+  }
+}
+
+.tableCellPlayerTop {
+  font-weight: 700 !important;
+}
+
+.tableCellPlayerOther {
+  font-weight: 500 !important;
+}
+
+.tableCellPoints {
+  color: #00e5ff !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  padding: 4px 2px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .tableCellPoints {
+    padding: 6px 4px !important;
+  }
+}
+
+.tableCellStat {
+  font-size: 0.6rem !important;
+  padding: 4px 2px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .tableCellStat {
+    font-size: 0.75rem !important;
+    padding: 6px 4px !important;
+  }
+}
+
+.tableCellPlayed {
+  color: #b0bec5 !important;
+}
+
+.tableCellWins {
+  color: #4caf50 !important;
+  font-weight: 600 !important;
+}
+
+.tableCellDraws {
+  color: #ff9800 !important;
+  font-weight: 600 !important;
+}
+
+.tableCellLosses {
+  color: #f44336 !important;
+  font-weight: 600 !important;
+}
+
+.tableCellGoalsFor {
+  color: #81c784 !important;
+  font-weight: 600 !important;
+}
+
+.tableCellGoalsAgainst {
+  color: #e57373 !important;
+  font-weight: 600 !important;
+}
+
+.tableCellGoalDiffPositive {
+  color: #4caf50 !important;
+  font-weight: 700 !important;
+}
+
+.tableCellGoalDiffNegative {
+  color: #f44336 !important;
+  font-weight: 700 !important;
+}
+
+/* Match List */
+.matchItem {
+  border-radius: 4px !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.matchContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.matchIcon {
+  font-size: 1rem !important;
+  color: #00e5ff !important;
+}
+
+/* Status Icons */
+.statusIconCompleted {
+  font-size: 1rem !important;
+  color: #4caf50 !important;
+}
+
+.statusIconInProgress {
+  font-size: 1rem !important;
+  color: #ff9800 !important;
+}
+
+.statusIconPending {
+  font-size: 1rem !important;
+  color: #9e9e9e !important;
+}

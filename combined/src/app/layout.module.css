@@ -1,0 +1,38 @@
+/* ===========================================
+   LAYOUT STYLES MODULE
+   =========================================== */
+
+/* App Bar and Navigation */
+.navContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.logoLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.logoContainer:hover {
+  transform: scale(1.05);
+}
+
+.logoImage {
+  cursor: pointer;
+}
+
+.navButton {
+  margin-right: 1rem !important;
+}
+
+.mainContainer {
+  margin-top: 1.5rem !important;
+}

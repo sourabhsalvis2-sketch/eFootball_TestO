@@ -1,0 +1,103 @@
+/* ===========================================
+   ADMIN DASHBOARD STYLES MODULE
+   =========================================== */
+
+/* Header Section */
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logoutButton {
+  border-color: #f44336 !important;
+  color: #f44336 !important;
+}
+
+.logoutButton:hover {
+  border-color: #d32f2f !important;
+  background-color: rgba(244, 67, 54, 0.1) !important;
+}
+
+/* Loading and Access States */
+.loadingContainer,
+.accessDeniedContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.accessDeniedTitle {
+  color: #f44336 !important;
+}
+
+.accessDeniedText {
+  color: #b0bec5 !important;
+}
+
+/* Grid Layout */
+.mainGrid {
+  margin-top: 1rem !important;
+}
+
+/* Cards */
+.cardMarginTop {
+  margin-top: 1rem !important;
+}
+
+/* Player Item Styling */
+.playerItemExtended {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Player item content styling handled by parent .playerItemExtended */
+
+.playerItemCaption {
+  color: #81c784 !important;
+  display: block !important;
+}
+
+.removeButton {
+  margin-left: 0.5rem !important;
+}
+
+/* Tournament Actions */
+.tournamentActionButton {
+  margin-right: 0.5rem !important;
+}
+
+/* Admin Section */
+.adminSectionMargin {
+  margin-top: 0.5rem !important;
+}
+
+/* No Data States */
+.noDataText {
+  color: #b0bec5 !important;
+  font-style: italic !important;
+}
+
+/* Match Details Text */
+.matchDetailsText {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Form Fields Spacing */
+.formFieldMargin {
+  margin-top: 0.5rem !important;
+}
+
+.formButtonMargin {
+  margin-top: 0.5rem !important;
+}
+
+/* Loading States for Buttons */
+.buttonLoadingIcon {
+  margin-right: 0.5rem !important;
+}

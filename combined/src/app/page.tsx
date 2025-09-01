@@ -38,9 +38,9 @@ export default function Home() {
         if (Array.isArray(r.data)) {
           setTournaments(r.data)
           setLoadError(null)
-          // fetch details for each tournament
+          // fetch details for each tournament, pass tournament data to avoid race condition
           for (const t of r.data) {
-            fetchDetails(t.id)
+            fetchDetails(t.id, t)
           }
         } else {
           console.error('Unexpected /api/tournaments response:', r.data)
@@ -67,7 +67,7 @@ export default function Home() {
     }))
   }, [])
 
-  async function fetchDetails(tid: number) {
+  async function fetchDetails(tid: number, tournamentData?: any) {
     // Prevent concurrent fetches for the same tournament
     if (fetchingDetails.has(tid)) return
     
@@ -79,9 +79,9 @@ export default function Home() {
     setDetails(d => ({ ...d, [tid]: { ...(d[tid] || {}), loading: true } }))
     
     try {
-      // Find the tournament to check its status
-      const tournament = tournaments.find(t => t.id === tid)
-      
+      // Use passed tournament data or find in current tournaments state
+      const tournament = tournamentData || tournaments.find(t => t.id === tid)
+
       const requests = [
         apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null)
       ]

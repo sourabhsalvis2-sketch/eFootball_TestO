@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import apiClient from '@/lib/api'
 import { 
   Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText, 
@@ -27,6 +27,7 @@ export default function Home() {
   const [tournaments, setTournaments] = useState<any[]>([])
   const [details, setDetails] = useState<Record<number, Details>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [fetchingDetails, setFetchingDetails] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     let mounted = true
@@ -56,12 +57,30 @@ export default function Home() {
     return () => { mounted = false }
   }, [])
 
+  const toggleExpanded = useCallback((tournamentId: number) => {
+    setDetails(d => ({
+      ...d,
+      [tournamentId]: {
+        ...(d[tournamentId] || {}),
+        expanded: !d[tournamentId]?.expanded
+      }
+    }))
+  }, [])
+
   async function fetchDetails(tid: number) {
+    // Prevent concurrent fetches for the same tournament
+    if (fetchingDetails.has(tid)) return
+    
+    setFetchingDetails(prev => {
+      const newSet = new Set(prev)
+      newSet.add(tid)
+      return newSet
+    })
     setDetails(d => ({ ...d, [tid]: { ...(d[tid] || {}), loading: true } }))
+    
     try {
-      // Get fresh tournament data to check current status
-      const tournamentResponse = await apiClient.get(`/api/tournaments`)
-      const tournament = tournamentResponse.data.find((t: any) => t.id === tid)
+      // Find the tournament to check its status
+      const tournament = tournaments.find(t => t.id === tid)
       
       const requests = [
         apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null)
@@ -77,9 +96,29 @@ export default function Home() {
       }
       
       const [s, w] = await Promise.all(requests)
-      setDetails(d => ({ ...d, [tid]: { standings: s, winner: w, loading: false } }))
+      setDetails(d => ({ 
+        ...d, 
+        [tid]: { 
+          ...(d[tid] || {}), // Preserve existing state like expanded
+          standings: s, 
+          winner: w, 
+          loading: false 
+        } 
+      }))
     } catch (e) {
-      setDetails(d => ({ ...d, [tid]: { ...(d[tid] || {}), loading: false } }))
+      setDetails(d => ({ 
+        ...d, 
+        [tid]: { 
+          ...(d[tid] || {}), // Preserve existing state like expanded
+          loading: false 
+        } 
+      }))
+    } finally {
+      setFetchingDetails(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(tid)
+        return newSet
+      })
     }
   }
 
@@ -183,7 +222,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                     <IconButton
-                      onClick={() => setDetails(d => ({ ...d, [t.id]: { ...(d[t.id] || {}), expanded: !d[t.id]?.expanded } }))}
+                      onClick={() => toggleExpanded(t.id)}
                       aria-label="expand"
                       sx={{ 
                         color: '#00e5ff',

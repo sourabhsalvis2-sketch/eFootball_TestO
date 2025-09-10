@@ -24,6 +24,15 @@ type Details = {
   showAllMatches?: boolean
 }
 
+const standingsHeaderCellSx = {
+  background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
+  color: '#00e5ff',
+  fontWeight: 700,
+  fontSize: { xs: '0.6rem', sm: '0.75rem' },
+  borderBottom: '2px solid rgba(0,229,255,0.3)',
+  padding: { xs: '6px 2px', sm: '8px 4px' }
+};
+
 export default function Home() {
   const [tournaments, setTournaments] = useState<any[]>([])
   const [details, setDetails] = useState<Record<number, Details>>({})
@@ -272,148 +281,66 @@ export default function Home() {
                                 border: '1px solid rgba(0,229,255,0.3)',
                                 borderRadius: 2,
                                 boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
-                                maxHeight: { xs: 300, sm: 400 },
-                                overflow: 'auto',
-                                '&::-webkit-scrollbar': {
-                                  width: '6px',
-                                },
-                                '&::-webkit-scrollbar-track': {
-                                  background: 'rgba(0,0,0,0.1)',
-                                },
-                                '&::-webkit-scrollbar-thumb': {
-                                  background: 'rgba(0,229,255,0.3)',
-                                  borderRadius: '3px',
-                                },
                               }}
                             >
-                              <Table size="small" stickyHeader>
+                              <Table stickyHeader>
                                 <TableHead>
                                   <TableRow>
                                     <TableCell 
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       #
                                     </TableCell>
                                     <TableCell 
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       Player
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       Pts
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       P
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       W
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       D
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       L
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       GS
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       GC
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={{ 
-                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.1) 0%, rgba(13,71,161,0.1) 100%)',
-                                        color: '#00e5ff',
-                                        fontWeight: 700,
-                                        fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                        borderBottom: '2px solid rgba(0,229,255,0.3)',
-                                        padding: { xs: '6px 2px', sm: '8px 4px' }
-                                      }}
+                                      sx={standingsHeaderCellSx}
                                     >
                                       GD
                                     </TableCell>

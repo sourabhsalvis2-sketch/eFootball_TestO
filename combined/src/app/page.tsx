@@ -21,6 +21,7 @@ type Details = {
   winner?: any | null
   loading?: boolean
   expanded?: boolean
+  showAllMatches?: boolean
 }
 
 export default function Home() {
@@ -460,7 +461,7 @@ export default function Home() {
                                           fontWeight: index < 3 ? 700 : 500,
                                           fontSize: '0.875rem',
                                           padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                          borderBottom: '1px solid rgba(255,255,255,0.1)'      
                                         }}
                                       >
                                         {s.name}
@@ -573,33 +574,76 @@ export default function Home() {
                         <Grid item xs={12} md={5}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>⚽ Matches</Typography>
                           {Array.isArray(t.matches) && t.matches.length ? (
-                            <List dense>
-                              {t.matches.sort((a: any, b: any) => {
-                                // Define round order: final first, then semi, then group
+                            (() => {
+                              // Sort matches as before
+                              const sortedMatches = [...t.matches].sort((a: any, b: any) => {
                                 const roundOrder = { final: 0, semi: 1, group: 2 }
                                 const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
                                 const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
                                 if (aOrder !== bOrder) return aOrder - bOrder
-                                // If same round, sort by id
                                 return a.id - b.id
-                              }).map((m: any) => (
-                                <ListItem 
-                                  key={m.id} 
-                                  className={getMatchStatusClass(m)}
-                                  sx={{ borderRadius: 1, mb: 0.5 }}
-                                >
-                                  <ListItemText 
-                                    primary={
-                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <SportsSoccerIcon sx={{ fontSize: 16, color: '#00e5ff' }} />
-                                        {`${playerLookup[m.player1_id] ?? m.player1_id} vs ${playerLookup[m.player2_id] ?? m.player2_id} — ${m.score1 ?? '-'} : ${m.score2 ?? '-'}`}
-                                      </Box>
-                                    }
-                                    secondary={`${m.round.toUpperCase()}`} 
-                                  />
-                                </ListItem>
-                              ))}
-                            </List>
+                              });
+                              // Split matches
+                              const mainMatches = sortedMatches.filter((m: any) => m.round === 'final' || m.round === 'semi');
+                              const otherMatches = sortedMatches.filter((m: any) => m.round !== 'final' && m.round !== 'semi');
+                              const expanded = details[t.id]?.showAllMatches;
+                              return (
+                                <>
+                                  <List dense>
+                                    {mainMatches.map((m: any) => (
+                                      <ListItem 
+                                        key={m.id} 
+                                        className={getMatchStatusClass(m)}
+                                        sx={{ borderRadius: 1, mb: 0.5 }}
+                                      >
+                                        <ListItemText 
+                                          primary={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                              <SportsSoccerIcon sx={{ fontSize: 16, color: '#00e5ff' }} />
+                                              {`${playerLookup[m.player1_id] ?? m.player1_id} vs ${playerLookup[m.player2_id] ?? m.player2_id} — ${m.score1 ?? '-'} : ${m.score2 ?? '-'}`}
+                                            </Box>
+                                          }
+                                          secondary={`${m.round.toUpperCase()}`} 
+                                        />
+                                      </ListItem>
+                                    ))}
+                                    {expanded && otherMatches.map((m: any) => (
+                                      <ListItem 
+                                        key={m.id} 
+                                        className={getMatchStatusClass(m)}
+                                        sx={{ borderRadius: 1, mb: 0.5 }}
+                                      >
+                                        <ListItemText 
+                                          primary={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                              <SportsSoccerIcon sx={{ fontSize: 16, color: '#00e5ff' }} />
+                                              {`${playerLookup[m.player1_id] ?? m.player1_id} vs ${playerLookup[m.player2_id] ?? m.player2_id} — ${m.score1 ?? '-'} : ${m.score2 ?? '-'}`}
+                                            </Box>
+                                          }
+                                          secondary={`${m.round.toUpperCase()}`} 
+                                        />
+                                      </ListItem>
+                                    ))}
+                                  </List>
+                                  {otherMatches.length > 0 && (
+                                    <Button 
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ mt: 1, color: '#00e5ff', borderColor: '#00e5ff' }}
+                                      onClick={() => setDetails(d => ({
+                                        ...d,
+                                        [t.id]: {
+                                          ...(d[t.id] || {}),
+                                          showAllMatches: !d[t.id]?.showAllMatches
+                                        }
+                                      }))}
+                                    >
+                                      {expanded ? 'Hide Group Matches' : 'Show All Matches'}
+                                    </Button>
+                                  )}
+                                </>
+                              );
+                            })()
                           ) : (
                             <Typography variant="body2" sx={{ color: '#b0bec5' }}>No matches yet</Typography>
                           )}

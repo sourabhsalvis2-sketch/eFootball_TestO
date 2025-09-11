@@ -190,7 +190,7 @@ export class DatabaseService {
     // Decide group count
     if (!groupCount) {
       if (playerIds.length <= 10) groupCount = 1
-      else if (playerIds.length <= 20) groupCount = 2
+      else if (playerIds.length <= 1) groupCount = 2
       else groupCount = 4
     }
 
@@ -304,19 +304,27 @@ export class DatabaseService {
         );
       }
     } else {
-      // ✅ More than 2 groups → Take overall top 8 → Quarters
-      const top8 = standings
-        .sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor)
-        .slice(0, 8);
+      // ✅ More than 2 groups (e.g., 4 groups) → take top 2 from each → total 8 players → Quarters
+      const topFromGroups: PlayerStats[] = [];
+      for (const g of groups) {
+        const top2 = grouped[g].slice(0, 2); // take top 2 from each group
+        topFromGroups.push(...top2);
+      }
 
-      if (top8.length === 8) {
-        const pairs = [
+      if (topFromGroups.length === 8) {
+        // Quarters seeding (1 vs 8, 2 vs 7, etc.)
+        const sorted = topFromGroups.sort(
+          (a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor
+        );
+
+        const pairs: [number, number][] = [
           [0, 7], [1, 6], [2, 5], [3, 4]
         ];
+
         for (const [i, j] of pairs) {
           await this.executeUpdate(
             "INSERT INTO matches (tournament_id, player1_id, player2_id, round, status) VALUES (?, ?, ?, 'quarter', 'scheduled')",
-            [tournamentId, top8[i].playerId, top8[j].playerId]
+            [tournamentId, sorted[i].playerId, sorted[j].playerId]
           );
         }
       }
@@ -324,13 +332,12 @@ export class DatabaseService {
   }
 
 
-
   static async tryAdvanceKnockout(tournamentId: number) {
-
+    // ========================
     // 1. Handle Quarters → Semis
     // ========================
     const quarters = await this.executeQuery<Match>(
-      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'quarter'",
+      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'quarter' ORDER BY id ASC",
       [tournamentId]
     );
 
@@ -339,29 +346,50 @@ export class DatabaseService {
         Number(m.score1) > Number(m.score2) ? m.player1_id : m.player2_id
       );
 
-      // Clear old semis before inserting new ones
-      await this.executeUpdate(
-        "DELETE FROM matches WHERE tournament_id = ? AND round = 'semi'",
+      const desiredSemis: [number, number][] = [
+        [winners[0], winners[3]], // Semi 1
+        [winners[1], winners[2]], // Semi 2
+      ];
+
+      const existingSemis = await this.executeQuery<Match>(
+        "SELECT * FROM matches WHERE tournament_id = ? AND round = 'semi' ORDER BY id ASC",
         [tournamentId]
       );
 
-      // Semi 1: Winner QF1 vs Winner QF4
-      await this.executeUpdate(
-        "INSERT INTO matches (tournament_id, player1_id, player2_id, round, status) VALUES (?, ?, ?, 'semi', 'scheduled')",
-        [tournamentId, winners[0], winners[3]]
-      );
-      // Semi 2: Winner QF2 vs Winner QF3
-      await this.executeUpdate(
-        "INSERT INTO matches (tournament_id, player1_id, player2_id, round, status) VALUES (?, ?, ?, 'semi', 'scheduled')",
-        [tournamentId, winners[1], winners[2]]
-      );
+      if (existingSemis.length === 2) {
+        // Compare participants
+        for (let i = 0; i < 2; i++) {
+          const semi = existingSemis[i];
+          const [p1, p2] = desiredSemis[i];
+
+          if (semi.player1_id !== p1 || semi.player2_id !== p2) {
+            // Update only if participants differ (reset scores)
+            await this.executeUpdate(
+              "UPDATE matches SET player1_id = ?, player2_id = ?, score1 = NULL, score2 = NULL, status = 'scheduled' WHERE id = ?",
+              [p1, p2, semi.id]
+            );
+          }
+        }
+      } else {
+        // Delete wrong/missing semis and recreate
+        await this.executeUpdate(
+          "DELETE FROM matches WHERE tournament_id = ? AND round = 'semi'",
+          [tournamentId]
+        );
+        for (const [p1, p2] of desiredSemis) {
+          await this.executeUpdate(
+            "INSERT INTO matches (tournament_id, player1_id, player2_id, round, status) VALUES (?, ?, ?, 'semi', 'scheduled')",
+            [tournamentId, p1, p2]
+          );
+        }
+      }
     }
 
     // ========================
     // 2. Handle Semis → Final
     // ========================
     const semis = await this.executeQuery<Match>(
-      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'semi'",
+      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'semi' ORDER BY id ASC",
       [tournamentId]
     );
 
@@ -370,16 +398,28 @@ export class DatabaseService {
         Number(m.score1) > Number(m.score2) ? m.player1_id : m.player2_id
       );
 
-      // Only create final if it doesn't exist
+      const desiredFinal: [number, number] = [winners[0], winners[1]];
+
       const existingFinal = await this.getOne<Match>(
         "SELECT * FROM matches WHERE tournament_id = ? AND round = 'final'",
         [tournamentId]
       );
 
-      if (!existingFinal) {
+      if (existingFinal) {
+        if (
+          existingFinal.player1_id !== desiredFinal[0] ||
+          existingFinal.player2_id !== desiredFinal[1]
+        ) {
+          // Update only if participants changed
+          await this.executeUpdate(
+            "UPDATE matches SET player1_id = ?, player2_id = ?, score1 = NULL, score2 = NULL, status = 'scheduled' WHERE id = ?",
+            [desiredFinal[0], desiredFinal[1], existingFinal.id]
+          );
+        }
+      } else {
         await this.executeUpdate(
           "INSERT INTO matches (tournament_id, player1_id, player2_id, round, status) VALUES (?, ?, ?, 'final', 'scheduled')",
-          [tournamentId, winners[0], winners[1]]
+          [tournamentId, desiredFinal[0], desiredFinal[1]]
         );
       }
     }
@@ -399,6 +439,8 @@ export class DatabaseService {
       );
     }
   }
+
+
 
 
   // ==============================

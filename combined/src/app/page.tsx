@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react'
 import apiClient from '@/lib/api'
-import { 
-  Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText, 
+import {
+  Typography, Card, CardContent, Grid, Button, Box, List, ListItem, ListItemText,
   Divider, CircularProgress, Collapse, IconButton, Chip,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from '@mui/material'
@@ -47,6 +47,7 @@ export default function Home() {
         if (!mounted) return
         if (Array.isArray(r.data)) {
           setTournaments(r.data)
+          console.log('Loaded tournaments:', r.data)
           setLoadError(null)
           // fetch details for each tournament, pass tournament data to avoid race condition
           for (const t of r.data) {
@@ -80,22 +81,23 @@ export default function Home() {
   async function fetchDetails(tid: number, tournamentData?: any) {
     // Prevent concurrent fetches for the same tournament
     if (fetchingDetails.has(tid)) return
-    
+
     setFetchingDetails(prev => {
       const newSet = new Set(prev)
       newSet.add(tid)
       return newSet
     })
     setDetails(d => ({ ...d, [tid]: { ...(d[tid] || {}), loading: true } }))
-    
+
     try {
       // Use passed tournament data or find in current tournaments state
       const tournament = tournamentData || tournaments.find(t => t.id === tid)
 
+
       const requests = [
         apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null)
       ]
-      
+
       // Only fetch winner for completed tournaments
       if (tournament?.status === 'completed') {
         requests.push(
@@ -104,24 +106,24 @@ export default function Home() {
       } else {
         requests.push(Promise.resolve(null)) // Return null for non-completed tournaments
       }
-      
+
       const [s, w] = await Promise.all(requests)
-      setDetails(d => ({ 
-        ...d, 
-        [tid]: { 
+      setDetails(d => ({
+        ...d,
+        [tid]: {
           ...(d[tid] || {}), // Preserve existing state like expanded
-          standings: s, 
-          winner: w, 
-          loading: false 
-        } 
+          standings: s,
+          winner: w,
+          loading: false
+        }
       }))
     } catch (e) {
-      setDetails(d => ({ 
-        ...d, 
-        [tid]: { 
+      setDetails(d => ({
+        ...d,
+        [tid]: {
           ...(d[tid] || {}), // Preserve existing state like expanded
-          loading: false 
-        } 
+          loading: false
+        }
       }))
     } finally {
       setFetchingDetails(prev => {
@@ -161,6 +163,20 @@ export default function Home() {
           const det = details[t.id] || {}
           const playerLookup: Record<number, string> = {}
           for (const p of (t.players || [])) playerLookup[p.id] = p.name
+
+          // Group standings by group name
+          const groupedStandings: Record<string, any[]> = (det.standings || []).reduce((acc, s) => {
+            const groupName = s.group || "Overall"; // Default if no group info
+            if (!acc[groupName]) {
+              acc[groupName] = [];
+            }
+            acc[groupName].push(s);
+            console.log('Grouped Standings: ', acc);
+            return acc;
+
+          }, {});
+
+
           return (
             <Card key={t.id} className="tournament-card" elevation={6}>
               <CardContent>
@@ -180,7 +196,7 @@ export default function Home() {
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   {/* Center section - Winner (hidden when expanded) */}
                   {!details[t.id]?.expanded && (
                     <Box className={styles.winnerSection}>
@@ -190,26 +206,26 @@ export default function Home() {
                           <Typography variant="h6" className={styles.championTitle}>
                             Champion
                           </Typography>
-                        <Typography variant="h5" className={styles.championName}>
-                          {det.winner.name}
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <Box>
-                        <EmojiEventsIcon sx={{ color: '#666', fontSize: 24, mb: 0.5 }} />
-                        <Typography variant="body1" sx={{ color: '#b0bec5' }}>
-                          {t.status === 'completed' ? 'No Winner' : 'Tournament in Progress'}
-                        </Typography>
-                      </Box>
-                    )}
+                          <Typography variant="h5" className={styles.championName}>
+                            {det.winner.name}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Box>
+                          <EmojiEventsIcon sx={{ color: '#666', fontSize: 24, mb: 0.5 }} />
+                          <Typography variant="body1" sx={{ color: '#b0bec5' }}>
+                            {t.status === 'completed' ? 'No Winner' : 'Tournament in Progress'}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
                   )}
-                  
+
                   {/* Right section - Players and Expand */}
-                  <Box sx={{ 
-                    textAlign: 'center', 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  <Box sx={{
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     gap: 2,
                     flexShrink: 0,
@@ -217,14 +233,14 @@ export default function Home() {
                   }}>
                     <Box sx={{ textAlign: 'center' }}>
                       <GroupIcon sx={{ color: '#00e5ff', fontSize: { xs: 18, sm: 20 } }} />
-                      <Typography variant="h6" sx={{ 
-                        color: '#ffffff', 
-                        fontSize: { xs: '0.875rem', sm: '1.25rem' } 
+                      <Typography variant="h6" sx={{
+                        color: '#ffffff',
+                        fontSize: { xs: '0.875rem', sm: '1.25rem' }
                       }}>
                         Players
                       </Typography>
-                      <Typography variant="h4" sx={{ 
-                        color: '#00e5ff', 
+                      <Typography variant="h4" sx={{
+                        color: '#00e5ff',
                         fontWeight: 700,
                         fontSize: { xs: '1.5rem', sm: '2.125rem' }
                       }}>
@@ -234,13 +250,13 @@ export default function Home() {
                     <IconButton
                       onClick={() => toggleExpanded(t.id)}
                       aria-label="expand"
-                      sx={{ 
+                      sx={{
                         color: '#00e5ff',
                         '&:hover': { backgroundColor: 'rgba(0,229,255,0.1)' }
                       }}
                     >
-                      <ExpandMoreIcon sx={{ 
-                        transform: details[t.id]?.expanded ? 'rotate(180deg)' : 'rotate(0deg)', 
+                      <ExpandMoreIcon sx={{
+                        transform: details[t.id]?.expanded ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 300ms',
                         fontSize: { xs: 24, sm: 28 }
                       }} />
@@ -273,226 +289,185 @@ export default function Home() {
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                             📊 Standings
                           </Typography>
-                          {det.standings && det.standings.length ? (
-                            <TableContainer 
-                              component={Paper} 
-                              sx={{ 
-                                background: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(13,27,42,0.95) 100%)',
-                                border: '1px solid rgba(0,229,255,0.3)',
-                                borderRadius: 2,
-                                boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
-                              }}
-                            >
-                              <Table stickyHeader>
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell 
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      #
-                                    </TableCell>
-                                    <TableCell 
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      Player
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      Pts
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      P
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      W
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      D
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      L
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      GS
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      GC
-                                    </TableCell>
-                                    <TableCell 
-                                      align="center"
-                                      sx={standingsHeaderCellSx}
-                                    >
-                                      GD
-                                    </TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {det.standings.map((s, index) => (
-                                    <TableRow 
-                                      key={s.playerId}
-                                      sx={{
-                                        background: index === 0 
-                                          ? 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.08) 100%)'
-                                          : index === 1
-                                          ? 'linear-gradient(90deg, rgba(224,224,224,0.12) 0%, rgba(192,192,192,0.06) 100%)'
-                                          : index === 2
-                                          ? 'linear-gradient(90deg, rgba(205,127,50,0.1) 0%, rgba(184,115,51,0.05) 100%)'
-                                          : 'transparent',
-                                        border: index === 0 
-                                          ? '1px solid rgba(255,215,0,0.4)' 
-                                          : index === 1
-                                          ? '1px solid rgba(224,224,224,0.3)'
-                                          : '1px solid transparent',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                          background: 'rgba(0,229,255,0.08)',
-                                          transform: 'translateX(4px)',
-                                          boxShadow: '4px 0 12px rgba(0,229,255,0.2)',
-                                        }
-                                      }}
-                                    >
-                                      <TableCell 
-                                        sx={{ 
-                                          color: index === 0 ? '#ffd700' : index === 1 ? '#e0e0e0' : index === 2 ? '#cd7f32' : '#ffffff',
-                                          fontWeight: index < 3 ? 700 : 400,
-                                          fontSize: '0.875rem',
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {index + 1}
-                                      </TableCell>
-                                      <TableCell 
-                                        sx={{ 
-                                          color: '#ffffff',
-                                          fontWeight: index < 3 ? 700 : 500,
-                                          fontSize: '0.875rem',
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'      
-                                        }}
-                                      >
-                                        {s.name}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#00e5ff',
-                                          fontWeight: 700,
-                                          fontSize: '0.875rem',
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.points}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#b0bec5',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.played}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#4caf50',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 600,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.wins}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#ff9800',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 600,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.draws}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#f44336',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 600,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.losses}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#81c784',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 600,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.goalsFor}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: '#e57373',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 600,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.goalsAgainst}
-                                      </TableCell>
-                                      <TableCell 
-                                        align="center"
-                                        sx={{ 
-                                          color: s.goalDiff >= 0 ? '#4caf50' : '#f44336',
-                                          fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                          fontWeight: 700,
-                                          padding: { xs: '4px 2px', sm: '6px 4px' },
-                                          borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                        }}
-                                      >
-                                        {s.goalDiff >= 0 ? '+' : ''}{s.goalDiff}
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
+                          {Object.keys(groupedStandings).length > 0 ? (
+                            Object.entries(groupedStandings).map(([groupName, standings]) => (
+                              <Box key={groupName} sx={{ mb: 4 }}>
+                                <Typography variant="h6" sx={{ color: '#00e5ff', mb: 1 }}>
+                                  {groupName}
+                                </Typography>
+                                <TableContainer
+                                  component={Paper}
+                                  sx={{
+                                    background: 'linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(13,27,42,0.95) 100%)',
+                                    border: '1px solid rgba(0,229,255,0.3)',
+                                    borderRadius: 2,
+                                    boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
+                                  }}
+                                >
+                                  <Table stickyHeader>
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell sx={standingsHeaderCellSx}>#</TableCell>
+                                        <TableCell sx={standingsHeaderCellSx}>Player</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>Pts</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>P</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>W</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>D</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>L</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>GS</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>GC</TableCell>
+                                        <TableCell align="center" sx={standingsHeaderCellSx}>GD</TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {standings.map((s: any, index: number) => (
+                                        <TableRow
+                                          key={s.playerId}
+                                          sx={{
+                                            background: index === 0
+                                              ? 'linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,193,7,0.08) 100%)'
+                                              : index === 1
+                                                ? 'linear-gradient(90deg, rgba(224,224,224,0.12) 0%, rgba(192,192,192,0.06) 100%)'
+                                                : index === 2
+                                                  ? 'linear-gradient(90deg, rgba(205,127,50,0.1) 0%, rgba(184,115,51,0.05) 100%)'
+                                                  : 'transparent',
+                                            border: index === 0
+                                              ? '1px solid rgba(255,215,0,0.4)'
+                                              : index === 1
+                                                ? '1px solid rgba(224,224,224,0.3)'
+                                                : '1px solid transparent',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                              background: 'rgba(0,229,255,0.08)',
+                                              transform: 'translateX(4px)',
+                                              boxShadow: '4px 0 12px rgba(0,229,255,0.2)',
+                                            }
+                                          }}
+                                        >
+                                          <TableCell
+                                            sx={{
+                                              color: index === 0 ? '#ffd700' : index === 1 ? '#e0e0e0' : index === 2 ? '#cd7f32' : '#ffffff',
+                                              fontWeight: index < 3 ? 700 : 400,
+                                              fontSize: '0.875rem',
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {index + 1}
+                                          </TableCell>
+                                          <TableCell
+                                            sx={{
+                                              color: '#ffffff',
+                                              fontWeight: index < 3 ? 700 : 500,
+                                              fontSize: '0.875rem',
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.name}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#00e5ff',
+                                              fontWeight: 700,
+                                              fontSize: '0.875rem',
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.points}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#b0bec5',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.played}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#4caf50',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 600,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.wins}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#ff9800',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 600,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.draws}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#f44336',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 600,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.losses}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#81c784',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 600,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.goalsFor}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: '#e57373',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 600,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.goalsAgainst}
+                                          </TableCell>
+                                          <TableCell
+                                            align="center"
+                                            sx={{
+                                              color: s.goalDiff >= 0 ? '#4caf50' : '#f44336',
+                                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                              fontWeight: 700,
+                                              padding: { xs: '4px 2px', sm: '6px 4px' },
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                            }}
+                                          >
+                                            {s.goalDiff >= 0 ? '+' : ''}{s.goalDiff}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </TableContainer>
+                              </Box>
+                            ))
                           ) : (
                             <Typography variant="body2" sx={{ color: '#b0bec5' }}>No standings yet</Typography>
                           )}
@@ -518,42 +493,42 @@ export default function Home() {
                                 <>
                                   <List dense>
                                     {mainMatches.map((m: any) => (
-                                      <ListItem 
-                                        key={m.id} 
+                                      <ListItem
+                                        key={m.id}
                                         className={getMatchStatusClass(m)}
                                         sx={{ borderRadius: 1, mb: 0.5 }}
                                       >
-                                        <ListItemText 
+                                        <ListItemText
                                           primary={
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                               <SportsSoccerIcon sx={{ fontSize: 16, color: '#00e5ff' }} />
                                               {`${playerLookup[m.player1_id] ?? m.player1_id} vs ${playerLookup[m.player2_id] ?? m.player2_id} — ${m.score1 ?? '-'} : ${m.score2 ?? '-'}`}
                                             </Box>
                                           }
-                                          secondary={`${m.round.toUpperCase()}`} 
+                                          secondary={`${m.round.toUpperCase()}`}
                                         />
                                       </ListItem>
                                     ))}
                                     {expanded && otherMatches.map((m: any) => (
-                                      <ListItem 
-                                        key={m.id} 
+                                      <ListItem
+                                        key={m.id}
                                         className={getMatchStatusClass(m)}
                                         sx={{ borderRadius: 1, mb: 0.5 }}
                                       >
-                                        <ListItemText 
+                                        <ListItemText
                                           primary={
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                               <SportsSoccerIcon sx={{ fontSize: 16, color: '#00e5ff' }} />
                                               {`${playerLookup[m.player1_id] ?? m.player1_id} vs ${playerLookup[m.player2_id] ?? m.player2_id} — ${m.score1 ?? '-'} : ${m.score2 ?? '-'}`}
                                             </Box>
                                           }
-                                          secondary={`${m.round.toUpperCase()}`} 
+                                          secondary={`${m.round.toUpperCase()}`}
                                         />
                                       </ListItem>
                                     ))}
                                   </List>
                                   {otherMatches.length > 0 && (
-                                    <Button 
+                                    <Button
                                       size="small"
                                       variant="outlined"
                                       sx={{ mt: 1, color: '#00e5ff', borderColor: '#00e5ff' }}

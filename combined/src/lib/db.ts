@@ -45,7 +45,7 @@ export interface PlayerStats {
   goalsAgainst: number
   goalDiff: number
   points: number
-  group?: string
+  group: string
 }
 
 // Database helper functions
@@ -122,7 +122,7 @@ export class DatabaseService {
     const tournaments = await this.executeQuery<Tournament>('SELECT * FROM tournaments ORDER BY id DESC')
 
     const result: TournamentWithDetails[] = []
-    
+
     for (const tournament of tournaments) {
       const players = await this.executeQuery<Player>(
         `SELECT p.id, p.name
@@ -256,8 +256,7 @@ export class DatabaseService {
 
   // Match operations
   static async updateMatchScore(matchId: number, score1: number, score2: number): Promise<Match & { winner?: Player }> {
-    console.log(`Updating match ${matchId} with scores ${score1}-${score2}`)
-    
+
     if (typeof score1 !== 'number' || typeof score2 !== 'number') {
       throw new Error('Scores must be numbers')
     }
@@ -268,7 +267,6 @@ export class DatabaseService {
       throw new Error('Match not found')
     }
 
-    console.log('Existing match:', existingMatch)
 
     // Update match score
     await this.executeUpdate(
@@ -360,12 +358,31 @@ export class DatabaseService {
 
       if (topFromGroups.length === 8) {
         // Quarters seeding (1 vs 8, 2 vs 7, etc.)
-        const sorted = topFromGroups.sort(
-          (a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor
-        );
+        //const groups: Record<string, typeof topFromGroups> = {};
+
+        // groups in the order you want
+        const groupOrder = ["GROUP 1", "GROUP 2", "GROUP 3", "GROUP 4"];
+
+        // pick top 2 from each group in order
+        const sorted: typeof topFromGroups = [];
+
+        for (const group of groupOrder) {
+          const playersInGroup = topFromGroups
+            .filter(p => p.group === group)
+            .sort(
+              (a, b) =>
+                b.points - a.points ||
+                b.goalDiff - a.goalDiff ||
+                b.goalsFor - a.goalsFor
+            );
+
+          sorted.push(...playersInGroup.slice(0, 2)); // take first 2
+        }
+
+        console.log(sorted);
 
         const pairs: [number, number][] = [
-          [0, 7], [1, 6], [2, 5], [3, 4]
+          [0, 3], [1, 2], [4, 7], [5, 6]
         ];
 
         for (const [i, j] of pairs) {
@@ -532,7 +549,6 @@ export class DatabaseService {
 
 
     for (const m of matches) {
-      console.log('Processing match:', m);
       const s1 = stats.find(s => s.playerId === m.player1_id)!
       const s2 = stats.find(s => s.playerId === m.player2_id)!
       if (!s1.group) s1.group = m.round;
@@ -550,7 +566,6 @@ export class DatabaseService {
     stats.sort((a, b) =>
       b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor
     )
-    console.log('Computed standings:', stats);
     return stats
   }
 

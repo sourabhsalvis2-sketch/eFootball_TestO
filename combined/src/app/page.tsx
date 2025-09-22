@@ -19,6 +19,8 @@ import styles from './page.module.css'
 type Details = {
   standings?: any[] | null
   winner?: any | null
+  runnerUp?: any | null
+  thirdPlace?: any | null
   loading?: boolean
   expanded?: boolean
   showAllMatches?: boolean
@@ -97,22 +99,38 @@ export default function Home() {
         apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null)
       ]
 
-      // Only fetch winner for completed tournaments
+      // Only fetch winner, runner-up, and third place for completed tournaments
       if (tournament?.status === 'completed') {
         requests.push(
-          apiClient.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null)
+          apiClient.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null),
+          apiClient.get(`/api/tournaments/${tid}/runner-up`).then(r => r.data).catch(() => null)
         )
+        
+        // Only fetch third place for tournaments with third place playoff enabled
+        if (tournament?.type === 'group_and_knockout' && tournament?.third_place_playoff) {
+          requests.push(
+            apiClient.get(`/api/tournaments/${tid}/third-place`).then(r => r.data).catch(() => null)
+          )
+        } else {
+          requests.push(Promise.resolve(null)) // third place not applicable
+        }
       } else {
-        requests.push(Promise.resolve(null)) // Return null for non-completed tournaments
+        requests.push(
+          Promise.resolve(null), // winner
+          Promise.resolve(null), // runner-up
+          Promise.resolve(null)  // third place
+        )
       }
 
-      const [s, w] = await Promise.all(requests)
+      const [s, w, ru, tp] = await Promise.all(requests)
       setDetails(d => ({
         ...d,
         [tid]: {
           ...(d[tid] || {}), // Preserve existing state like expanded
           standings: s,
           winner: w,
+          runnerUp: ru,
+          thirdPlace: tp,
           loading: false
         }
       }))
@@ -196,18 +214,45 @@ export default function Home() {
                     </Box>
                   </Box>
 
-                  {/* Center section - Winner (hidden when expanded) */}
+                  {/* Center section - Top 3 Results (hidden when expanded) */}
                   {!details[t.id]?.expanded && (
                     <Box className={styles.winnerSection}>
                       {det.winner ? (
                         <Box>
-                          <EmojiEventsIcon className={styles.trophyIcon} />
-                          <Typography variant="h6" className={styles.championTitle}>
-                            Champion
-                          </Typography>
-                          <Typography variant="h5" className={styles.championName}>
-                            {det.winner.name}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <EmojiEventsIcon className={styles.trophyIcon} />
+                            <Typography variant="h6" className={styles.championTitle}>
+                              Results
+                            </Typography>
+                          </Box>
+                          
+                          {/* Winner */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <span style={{ fontSize: '1.2rem' }}>🏆</span>
+                            <Typography variant="body1" sx={{ fontWeight: 600, color: '#ffd700' }}>
+                              {det.winner.name}
+                            </Typography>
+                          </Box>
+                          
+                          {/* Runner-up */}
+                          {det.runnerUp && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                              <span style={{ fontSize: '1.1rem' }}>🥈</span>
+                              <Typography variant="body2" sx={{ fontWeight: 500, color: '#c0c0c0' }}>
+                                {det.runnerUp.name}
+                              </Typography>
+                            </Box>
+                          )}
+                          
+                          {/* Third place */}
+                          {det.thirdPlace && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <span style={{ fontSize: '1.1rem' }}>🥉</span>
+                              <Typography variant="body2" sx={{ fontWeight: 500, color: '#cd7f32' }}>
+                                {det.thirdPlace.name}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
                       ) : (
                         <Box>
@@ -269,22 +314,37 @@ export default function Home() {
                       <Box sx={{ display: 'flex', alignItems: 'center' }}><CircularProgress size={18} /> <Typography sx={{ ml: 1 }}>Loading details...</Typography></Box>
                     ) : (
                       <Grid container spacing={2} sx={{ alignItems: 'flex-start' }}>
-                        <Grid item xs={12} md={2}>
+                        <Grid item xs={12} md={3}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
-                            🏆 Winner
+                            🏆 Results
                           </Typography>
                           <Box className="winner-box">
                             {det.winner ? (
-                              <>
-                                <Chip label={det.winner.name} color="success" sx={{ fontWeight: 600, fontSize: '1rem' }} />
-                              </>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <span>🏆</span>
+                                  <Chip label={det.winner.name} color="success" sx={{ fontWeight: 600, fontSize: '0.9rem' }} />
+                                </Box>
+                                {det.runnerUp && (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>🥈</span>
+                                    <Chip label={det.runnerUp.name} variant="outlined" sx={{ fontWeight: 500, fontSize: '0.85rem', borderColor: '#c0c0c0', color: '#c0c0c0' }} />
+                                  </Box>
+                                )}
+                                {det.thirdPlace && (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>🥉</span>
+                                    <Chip label={det.thirdPlace.name} variant="outlined" sx={{ fontWeight: 500, fontSize: '0.85rem', borderColor: '#cd7f32', color: '#cd7f32' }} />
+                                  </Box>
+                                )}
+                              </Box>
                             ) : (
                               <Typography sx={{ color: '#b0bec5' }}>TBD</Typography>
                             )}
                           </Box>
                         </Grid>
 
-                        <Grid item xs={12} md={5}>
+                        <Grid item xs={12} md={4}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                             📊 Standings
                           </Typography>
@@ -301,66 +361,98 @@ export default function Home() {
                                     border: '1px solid rgba(0,229,255,0.3)',
                                     borderRadius: 2,
                                     boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
+                                    overflowX: 'hidden !important',
+                                    width: '100%'
                                   }}
                                 >
-                                  <Table stickyHeader>
+                                  <Table stickyHeader sx={{ tableLayout: 'fixed', width: '100%' }}>
                                     <TableHead>
                                       <TableRow>
                                     <TableCell 
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '8%'
+                                      }}
                                     >
                                       #
                                     </TableCell>
                                     <TableCell 
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '36%'
+                                      }}
                                     >
                                       Player
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '9%'
+                                      }}
                                     >
                                       Pts
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       P
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       W
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       D
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       L
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '7%'
+                                      }}
                                     >
                                       GS
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '7%'
+                                      }}
                                     >
                                       GC
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '9%'
+                                      }}
                                     >
                                       GD
                                     </TableCell>
@@ -397,7 +489,8 @@ export default function Home() {
                                               fontWeight: index < 3 ? 700 : 400,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              width: '8%'
                                             }}
                                           >
                                             {index + 1}
@@ -408,7 +501,14 @@ export default function Home() {
                                               fontWeight: index < 3 ? 700 : 500,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'normal !important',
+                                              wordWrap: 'break-word',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important',
+                                              lineHeight: 1.2,
+                                              minWidth: 0,
+                                              maxWidth: { xs: '80px', sm: '120px' }
                                             }}
                                           >
                                             {s.name}
@@ -420,7 +520,10 @@ export default function Home() {
                                               fontWeight: 700,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.points}
@@ -431,7 +534,10 @@ export default function Home() {
                                               color: '#b0bec5',
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.played}
@@ -443,7 +549,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.wins}
@@ -455,7 +564,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.draws}
@@ -467,7 +579,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.losses}
@@ -479,7 +594,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalsFor}
@@ -491,7 +609,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalsAgainst}
@@ -503,7 +624,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 700,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalDiff >= 0 ? '+' : ''}{s.goalDiff}
@@ -526,15 +650,27 @@ export default function Home() {
                             (() => {
                               // Sort matches as before
                               const sortedMatches = [...t.matches].sort((a: any, b: any) => {
-                                const roundOrder = { final: 0, semi: 1, group: 2 }
-                                const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
-                                const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
+                                // Define round order: final first, then third-place, semi, quarter, then group
+                                const roundOrder = { 
+                                  final: 0, 
+                                  'third-place': 1, 
+                                  semi: 2, 
+                                  quarter: 3, 
+                                  'round-of-16': 4,
+                                  group: 5 
+                                }
+                                const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 6
+                                const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 6
                                 if (aOrder !== bOrder) return aOrder - bOrder
                                 return a.id - b.id
                               });
-                              // Split matches
-                              const mainMatches = sortedMatches.filter((m: any) => m.round === 'final' || m.round === 'semi');
-                              const otherMatches = sortedMatches.filter((m: any) => m.round !== 'final' && m.round !== 'semi');
+                              // Split matches - include quarter and third-place in main matches
+                              const mainMatches = sortedMatches.filter((m: any) => 
+                                m.round === 'final' || m.round === 'semi' || m.round === 'quarter' || m.round === 'third-place' || m.round === 'round-of-16'
+                              );
+                              const otherMatches = sortedMatches.filter((m: any) => 
+                                m.round !== 'final' && m.round !== 'semi' && m.round !== 'quarter' && m.round !== 'third-place' && m.round !== 'round-of-16'
+                              );
                               const expanded = details[t.id]?.showAllMatches;
                               return (
                                 <>

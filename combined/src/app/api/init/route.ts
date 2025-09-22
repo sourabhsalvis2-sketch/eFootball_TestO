@@ -15,7 +15,12 @@ export async function POST() {
       CREATE TABLE IF NOT EXISTS tournaments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        status TEXT DEFAULT 'pending'
+        status TEXT DEFAULT 'pending',
+        type TEXT DEFAULT 'round_robin',
+        teams_per_group INTEGER DEFAULT 4,
+        teams_advancing_per_group INTEGER DEFAULT 2,
+        allow_third_place_teams BOOLEAN DEFAULT FALSE,
+        third_place_playoff BOOLEAN DEFAULT FALSE
       )
     `)
 
@@ -39,6 +44,8 @@ export async function POST() {
         score2 INTEGER,
         round TEXT DEFAULT 'group',
         status TEXT DEFAULT 'scheduled',
+        group_letter TEXT,
+        stage TEXT DEFAULT 'group',
         FOREIGN KEY (tournament_id) REFERENCES tournaments(id),
         FOREIGN KEY (player1_id) REFERENCES players(id),
         FOREIGN KEY (player2_id) REFERENCES players(id)

@@ -294,6 +294,10 @@ export class DatabaseService {
       throw new Error('Not enough teams for knockout stage. Need at least 2 qualifying teams.')
     }
 
+    // Ensure players are properly shuffled before group assignment
+    // This prevents groups from being formed based on player addition order
+    this.shuffle(playerIds)
+    
     // Distribute players into groups as evenly as possible
     const groups: number[][] = Array.from({ length: actualGroups }, () => [])
     
@@ -333,6 +337,10 @@ export class DatabaseService {
       else groupCount = 4
     }
 
+    // Ensure players are properly shuffled before group assignment
+    // This prevents groups from being formed based on player addition order
+    this.shuffle(playerIds)
+    
     const groups: number[][] = Array.from({ length: groupCount }, () => [])
     
     playerIds.forEach((p, idx) => {
@@ -1181,12 +1189,11 @@ export class DatabaseService {
   // Utilities
   // ==============================
   static shuffle(array: number[]) {
-    let i = array.length
-    while (i) {
-      const j = Math.floor(Math.random() * i--)
-        ;[array[i], array[j]] = [array[j], array[i]]
+    // Fisher-Yates shuffle algorithm for better randomization
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-
   }
 
   static async getTournamentWinner(tournamentId: number): Promise<Player | null> {

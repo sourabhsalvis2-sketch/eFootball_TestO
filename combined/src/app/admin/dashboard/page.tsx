@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import apiClient from '@/lib/api'
-import { Box, Typography, TextField, Button, Grid, Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material'
+import { Box, Typography, TextField, Button, Grid, Card, CardContent, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useAdminAuth } from '@/hooks/useAdminAuth'
 
 export default function AdminDashboard() {
@@ -28,6 +29,9 @@ export default function AdminDashboard() {
   const [generateLoading, setGenerateLoading] = useState(false)
   const [addPlayerLoading, setAddPlayerLoading] = useState(false)
   const [submitScoreLoading, setSubmitScoreLoading] = useState(false)
+  // State for collapsible sections - track expanded state by tournament ID
+  const [expandedPlayers, setExpandedPlayers] = useState<Set<number>>(new Set())
+  const [expandedMatches, setExpandedMatches] = useState<Set<number>>(new Set())
 
   useEffect(() => load(), [])
 
@@ -204,6 +208,31 @@ export default function AdminDashboard() {
     setCurrentMatch(null)
     setDialogScore1('')
     setDialogScore2('')
+  }
+
+  // Helper functions for managing collapsible sections
+  function togglePlayersExpansion(tournamentId: number) {
+    setExpandedPlayers(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(tournamentId)) {
+        newSet.delete(tournamentId)
+      } else {
+        newSet.add(tournamentId)
+      }
+      return newSet
+    })
+  }
+
+  function toggleMatchesExpansion(tournamentId: number) {
+    setExpandedMatches(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(tournamentId)) {
+        newSet.delete(tournamentId)
+      } else {
+        newSet.add(tournamentId)
+      }
+      return newSet
+    })
   }
 
   async function deleteTournament(tournamentId: number, tournamentName: string) {
@@ -587,69 +616,94 @@ export default function AdminDashboard() {
                   </Button>
                 </Box>
 
-                <Box sx={{ mt: 1 }} className="admin-section">
-                  <Typography variant="subtitle2" className="section-subtitle">Players in Tournament</Typography>
-                  <Box className="players-list">
-                    {t.players?.map((p: any) => (
-                      <Box key={p.id} className="player-item" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box>
-                          <span className="player-name">{p.name}</span>
-                          <Typography variant="caption" sx={{ color: '#81c784', display: 'block' }}>
-                            In Tournament
-                          </Typography>
+                <Accordion 
+                  expanded={expandedPlayers.has(t.id)} 
+                  onChange={() => togglePlayersExpansion(t.id)}
+                  sx={{ mt: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle2" className="section-subtitle">
+                      Players in Tournament ({t.players?.length || 0})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box className="players-list">
+                      {t.players?.map((p: any) => (
+                        <Box key={p.id} className="player-item" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Box>
+                            <span className="player-name">{p.name}</span>
+                            <Typography variant="caption" sx={{ color: '#81c784', display: 'block' }}>
+                              In Tournament
+                            </Typography>
+                          </Box>
+                          {t.status === 'pending' && (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="error"
+                              onClick={() => removePlayerFromTournament(t.id, p.id, p.name)}
+                              sx={{ ml: 1 }}
+                            >
+                              Remove
+                            </Button>
+                          )}
                         </Box>
-                        {t.status === 'pending' && (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color="error"
-                            onClick={() => removePlayerFromTournament(t.id, p.id, p.name)}
-                            sx={{ ml: 1 }}
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </Box>
-                    ))}
-                    {(!t.players || t.players.length === 0) && (
-                      <Typography variant="body2" sx={{ color: '#b0bec5', fontStyle: 'italic' }}>
-                        No players added to this tournament yet
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
+                      ))}
+                      {(!t.players || t.players.length === 0) && (
+                        <Typography variant="body2" sx={{ color: '#b0bec5', fontStyle: 'italic' }}>
+                          No players added to this tournament yet
+                        </Typography>
+                      )}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
 
-                <Box sx={{ mt: 1 }} className="admin-section">
-                  <Typography variant="subtitle2" className="section-subtitle">Matches</Typography>
-                  <Box className="matches-list">
-                    {t.matches?.sort((a: any, b: any) => {
-                      // Define round order: final first, then semi, then group
-                      const roundOrder = { final: 0, semi: 1, group: 2 }
-                      const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
-                      const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
-                      if (aOrder !== bOrder) return aOrder - bOrder
-                      // If same round, sort by id
-                      return a.id - b.id
-                    }).map((m: any) => (
-                      <Box key={m.id} className="match-item">
-                        <span className="match-details">
-                          <span className="match-round">{m.round}</span> - 
-                          <span className="match-players"> {getPlayerName(t, m.player1_id)} vs {getPlayerName(t, m.player2_id)}</span> - 
-                          <span className="match-score">{m.score1 ?? '-'}:{m.score2 ?? '-'}</span>
-                        </span>
-                        <Button 
-                          size="small" 
-                          onClick={() => { setSelectedTournament(t.id); setScore(m.id); }} 
-                          disabled={submitScoreLoading}
-                          className="match-action-button"
-                          variant="outlined"
-                        > 
-                          {submitScoreLoading ? <CircularProgress size={12} /> : 'Set Score'}
-                        </Button>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
+                <Accordion 
+                  expanded={expandedMatches.has(t.id)} 
+                  onChange={() => toggleMatchesExpansion(t.id)}
+                  sx={{ mt: 1, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle2" className="section-subtitle">
+                      Matches ({t.matches?.length || 0})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box className="matches-list">
+                      {t.matches?.sort((a: any, b: any) => {
+                        // Define round order: final first, then semi, then group
+                        const roundOrder = { final: 0, semi: 1, group: 2 }
+                        const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
+                        const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
+                        if (aOrder !== bOrder) return aOrder - bOrder
+                        // If same round, sort by id
+                        return a.id - b.id
+                      }).map((m: any) => (
+                        <Box key={m.id} className="match-item">
+                          <span className="match-details">
+                            <span className="match-round">{m.round}</span> - 
+                            <span className="match-players"> {getPlayerName(t, m.player1_id)} vs {getPlayerName(t, m.player2_id)}</span> - 
+                            <span className="match-score">{m.score1 ?? '-'}:{m.score2 ?? '-'}</span>
+                          </span>
+                          <Button 
+                            size="small" 
+                            onClick={() => { setSelectedTournament(t.id); setScore(m.id); }} 
+                            disabled={submitScoreLoading}
+                            className="match-action-button"
+                            variant="outlined"
+                          > 
+                            {submitScoreLoading ? <CircularProgress size={12} /> : 'Set Score'}
+                          </Button>
+                        </Box>
+                      ))}
+                      {(!t.matches || t.matches.length === 0) && (
+                        <Typography variant="body2" sx={{ color: '#b0bec5', fontStyle: 'italic' }}>
+                          No matches generated yet
+                        </Typography>
+                      )}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
                 <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   <Button 
                     variant="outlined" 

@@ -266,6 +266,28 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 {
 .tournament-actions { margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
 .admin-section { margin-top: 16px !important; padding: 12px 0; border-top: 1px solid rgba(0,200,255,0.1); }
 
+/* Accordion Styling for Tournament Sections */
+.MuiAccordion-root {
+  border: 1px solid rgba(0,200,255,0.2) !important;
+  border-radius: 8px !important;
+}
+
+.MuiAccordion-root:before {
+  display: none !important;
+}
+
+.MuiAccordionSummary-root {
+  border-radius: 8px !important;
+}
+
+.MuiAccordionSummary-root:hover {
+  background-color: rgba(0,200,255,0.08) !important;
+}
+
+.MuiAccordionDetails-root {
+  padding-top: 8px !important;
+}
+
 .player-item, .match-item {
   display: flex;
   justify-content: space-between;

@@ -107,6 +107,56 @@ export default function AdminDashboard() {
     }
   }
 
+  async function addAllPlayersToTournament() {
+    if (!selectedTournament) return alert('Please select a tournament first')
+    if (allPlayers.length === 0) return alert('No players available to add')
+    
+    setAddPlayerLoading(true)
+    try {
+      const response = await apiClient.post(`/api/tournaments/${selectedTournament}/players/bulk`, { 
+        addAllPlayers: true 
+      })
+      
+      const result = response.data
+      const { summary, results } = result
+      
+      // Create a detailed message
+      let message = `Bulk operation completed:\n`
+      message += `• Successfully added: ${summary.successful} players\n`
+      
+      if (summary.skipped > 0) {
+        message += `• Already in tournament: ${summary.skipped} players\n`
+      }
+      
+      if (summary.failed > 0) {
+        message += `• Failed to add: ${summary.failed} players\n`
+      }
+      
+      // Show detailed results if there are failures
+      if (results.failed.length > 0) {
+        message += `\nFailed players:\n`
+        results.failed.forEach((failure: any) => {
+          message += `• ${failure.playerName}: ${failure.error}\n`
+        })
+      }
+      
+      alert(message)
+      load() // Refresh the data
+      
+    } catch (error: any) {
+      console.error('Error adding all players:', error)
+      let errorMessage = 'Failed to add players to tournament'
+      
+      if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error
+      }
+      
+      alert(errorMessage)
+    } finally {
+      setAddPlayerLoading(false)
+    }
+  }
+
   async function generateMatches(tid: number) {
     setGenerateLoading(true)
     try {
@@ -453,6 +503,18 @@ export default function AdminDashboard() {
               <Typography variant="body2" sx={{ mb: 2, color: '#b0bec5' }}>
                 Select a tournament first, then click "Add to selected" to add players
               </Typography>
+              {allPlayers.length > 0 && (
+                <Button 
+                  variant="contained" 
+                  fullWidth
+                  onClick={addAllPlayersToTournament}
+                  disabled={addPlayerLoading || !selectedTournament}
+                  sx={{ mb: 2, backgroundColor: '#4caf50', '&:hover': { backgroundColor: '#388e3c' } }}
+                >
+                  {addPlayerLoading ? <CircularProgress size={16} sx={{ mr: 1 }} /> : null}
+                  Add all to selected tournament
+                </Button>
+              )}
               <Box className="players-list">
                 {allPlayers.map((p: any) => (
                   <Box key={p.id} className="player-item">

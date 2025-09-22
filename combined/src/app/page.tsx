@@ -361,66 +361,98 @@ export default function Home() {
                                     border: '1px solid rgba(0,229,255,0.3)',
                                     borderRadius: 2,
                                     boxShadow: '0 8px 32px rgba(0,229,255,0.15)',
+                                    overflowX: 'hidden !important',
+                                    width: '100%'
                                   }}
                                 >
-                                  <Table stickyHeader>
+                                  <Table stickyHeader sx={{ tableLayout: 'fixed', width: '100%' }}>
                                     <TableHead>
                                       <TableRow>
                                     <TableCell 
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '8%'
+                                      }}
                                     >
                                       #
                                     </TableCell>
                                     <TableCell 
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '36%'
+                                      }}
                                     >
                                       Player
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '9%'
+                                      }}
                                     >
                                       Pts
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       P
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       W
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       D
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '6%'
+                                      }}
                                     >
                                       L
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '7%'
+                                      }}
                                     >
                                       GS
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '7%'
+                                      }}
                                     >
                                       GC
                                     </TableCell>
                                     <TableCell 
                                       align="center"
-                                      sx={standingsHeaderCellSx}
+                                      sx={{
+                                        ...standingsHeaderCellSx,
+                                        width: '9%'
+                                      }}
                                     >
                                       GD
                                     </TableCell>
@@ -457,7 +489,8 @@ export default function Home() {
                                               fontWeight: index < 3 ? 700 : 400,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              width: '8%'
                                             }}
                                           >
                                             {index + 1}
@@ -468,7 +501,14 @@ export default function Home() {
                                               fontWeight: index < 3 ? 700 : 500,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'normal !important',
+                                              wordWrap: 'break-word',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important',
+                                              lineHeight: 1.2,
+                                              minWidth: 0,
+                                              maxWidth: { xs: '80px', sm: '120px' }
                                             }}
                                           >
                                             {s.name}
@@ -480,7 +520,10 @@ export default function Home() {
                                               fontWeight: 700,
                                               fontSize: '0.875rem',
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.points}
@@ -491,7 +534,10 @@ export default function Home() {
                                               color: '#b0bec5',
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.played}
@@ -503,7 +549,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.wins}
@@ -515,7 +564,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.draws}
@@ -527,7 +579,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.losses}
@@ -539,7 +594,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalsFor}
@@ -551,7 +609,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 600,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalsAgainst}
@@ -563,7 +624,10 @@ export default function Home() {
                                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                                               fontWeight: 700,
                                               padding: { xs: '4px 2px', sm: '6px 4px' },
-                                              borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'visible !important',
+                                              textOverflow: 'unset !important'
                                             }}
                                           >
                                             {s.goalDiff >= 0 ? '+' : ''}{s.goalDiff}

@@ -197,7 +197,7 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 {
    =========================================== */
 .MuiTableContainer-root {
   max-height: none !important;
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: visible !important;
   width: 100% !important;
 }
@@ -205,13 +205,28 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 {
 .MuiTable-root {
   background: transparent !important;
   width: 100% !important;
-  table-layout: auto !important;
+  table-layout: fixed !important;
 }
 
 .MuiTable-root .MuiTableCell-root {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+}
+
+/* Override for standings tables - prevent ellipses and allow proper display */
+.MuiTable-root .MuiTableCell-root {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+/* Allow player names to wrap to multiple lines */
+.MuiTable-root .MuiTableCell-root:nth-child(2) {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
 }
 
 /* ===========================================
@@ -414,7 +429,7 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 {
   /* Table mobile optimization */
   .MuiTableContainer-root {
     max-height: none !important;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
     overflow-y: visible !important;
     width: 100% !important;
     margin: 0 !important;
@@ -422,7 +437,12 @@ h1, h2, h3, h4, h5, h6, .MuiTypography-h4, .MuiTypography-h5 {
   
   .MuiTable-root {
     width: 100% !important;
-    min-width: 320px !important;
+    table-layout: fixed !important;
+  }
+  
+  /* Mobile: Make player name column wider */
+  .MuiTable-root .MuiTableCell-root:nth-child(2) {
+    width: 40% !important;
   }
   
   /* Lists mobile spacing */

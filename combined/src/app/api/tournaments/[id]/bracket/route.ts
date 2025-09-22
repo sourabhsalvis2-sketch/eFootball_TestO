@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DatabaseService } from '@/lib/db'
 
-interface RouteParams {
-  params: {
-    id: string
-  }
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const tournamentId = parseInt(params.id)
+    const resolvedParams = await params
+    const tournamentId = parseInt(resolvedParams.id)
     
     if (isNaN(tournamentId)) {
       return NextResponse.json(
@@ -59,9 +57,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // Endpoint to manually trigger knockout bracket generation (for debugging/admin)
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const tournamentId = parseInt(params.id)
+    const resolvedParams = await params
+    const tournamentId = parseInt(resolvedParams.id)
     
     if (isNaN(tournamentId)) {
       return NextResponse.json(

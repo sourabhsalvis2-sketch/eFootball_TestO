@@ -19,6 +19,8 @@ import styles from './page.module.css'
 type Details = {
   standings?: any[] | null
   winner?: any | null
+  runnerUp?: any | null
+  thirdPlace?: any | null
   loading?: boolean
   expanded?: boolean
   showAllMatches?: boolean
@@ -97,22 +99,38 @@ export default function Home() {
         apiClient.get(`/api/tournaments/${tid}/standings`).then(r => r.data).catch(() => null)
       ]
 
-      // Only fetch winner for completed tournaments
+      // Only fetch winner, runner-up, and third place for completed tournaments
       if (tournament?.status === 'completed') {
         requests.push(
-          apiClient.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null)
+          apiClient.get(`/api/tournaments/${tid}/winner`).then(r => r.data).catch(() => null),
+          apiClient.get(`/api/tournaments/${tid}/runner-up`).then(r => r.data).catch(() => null)
         )
+        
+        // Only fetch third place for tournaments with third place playoff enabled
+        if (tournament?.type === 'group_and_knockout' && tournament?.third_place_playoff) {
+          requests.push(
+            apiClient.get(`/api/tournaments/${tid}/third-place`).then(r => r.data).catch(() => null)
+          )
+        } else {
+          requests.push(Promise.resolve(null)) // third place not applicable
+        }
       } else {
-        requests.push(Promise.resolve(null)) // Return null for non-completed tournaments
+        requests.push(
+          Promise.resolve(null), // winner
+          Promise.resolve(null), // runner-up
+          Promise.resolve(null)  // third place
+        )
       }
 
-      const [s, w] = await Promise.all(requests)
+      const [s, w, ru, tp] = await Promise.all(requests)
       setDetails(d => ({
         ...d,
         [tid]: {
           ...(d[tid] || {}), // Preserve existing state like expanded
           standings: s,
           winner: w,
+          runnerUp: ru,
+          thirdPlace: tp,
           loading: false
         }
       }))
@@ -196,18 +214,45 @@ export default function Home() {
                     </Box>
                   </Box>
 
-                  {/* Center section - Winner (hidden when expanded) */}
+                  {/* Center section - Top 3 Results (hidden when expanded) */}
                   {!details[t.id]?.expanded && (
                     <Box className={styles.winnerSection}>
                       {det.winner ? (
                         <Box>
-                          <EmojiEventsIcon className={styles.trophyIcon} />
-                          <Typography variant="h6" className={styles.championTitle}>
-                            Champion
-                          </Typography>
-                          <Typography variant="h5" className={styles.championName}>
-                            {det.winner.name}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <EmojiEventsIcon className={styles.trophyIcon} />
+                            <Typography variant="h6" className={styles.championTitle}>
+                              Results
+                            </Typography>
+                          </Box>
+                          
+                          {/* Winner */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <span style={{ fontSize: '1.2rem' }}>🏆</span>
+                            <Typography variant="body1" sx={{ fontWeight: 600, color: '#ffd700' }}>
+                              {det.winner.name}
+                            </Typography>
+                          </Box>
+                          
+                          {/* Runner-up */}
+                          {det.runnerUp && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                              <span style={{ fontSize: '1.1rem' }}>🥈</span>
+                              <Typography variant="body2" sx={{ fontWeight: 500, color: '#c0c0c0' }}>
+                                {det.runnerUp.name}
+                              </Typography>
+                            </Box>
+                          )}
+                          
+                          {/* Third place */}
+                          {det.thirdPlace && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <span style={{ fontSize: '1.1rem' }}>🥉</span>
+                              <Typography variant="body2" sx={{ fontWeight: 500, color: '#cd7f32' }}>
+                                {det.thirdPlace.name}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
                       ) : (
                         <Box>
@@ -269,22 +314,37 @@ export default function Home() {
                       <Box sx={{ display: 'flex', alignItems: 'center' }}><CircularProgress size={18} /> <Typography sx={{ ml: 1 }}>Loading details...</Typography></Box>
                     ) : (
                       <Grid container spacing={2} sx={{ alignItems: 'flex-start' }}>
-                        <Grid item xs={12} md={2}>
+                        <Grid item xs={12} md={3}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
-                            🏆 Winner
+                            🏆 Results
                           </Typography>
                           <Box className="winner-box">
                             {det.winner ? (
-                              <>
-                                <Chip label={det.winner.name} color="success" sx={{ fontWeight: 600, fontSize: '1rem' }} />
-                              </>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <span>🏆</span>
+                                  <Chip label={det.winner.name} color="success" sx={{ fontWeight: 600, fontSize: '0.9rem' }} />
+                                </Box>
+                                {det.runnerUp && (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>🥈</span>
+                                    <Chip label={det.runnerUp.name} variant="outlined" sx={{ fontWeight: 500, fontSize: '0.85rem', borderColor: '#c0c0c0', color: '#c0c0c0' }} />
+                                  </Box>
+                                )}
+                                {det.thirdPlace && (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>🥉</span>
+                                    <Chip label={det.thirdPlace.name} variant="outlined" sx={{ fontWeight: 500, fontSize: '0.85rem', borderColor: '#cd7f32', color: '#cd7f32' }} />
+                                  </Box>
+                                )}
+                              </Box>
                             ) : (
                               <Typography sx={{ color: '#b0bec5' }}>TBD</Typography>
                             )}
                           </Box>
                         </Grid>
 
-                        <Grid item xs={12} md={5}>
+                        <Grid item xs={12} md={4}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                             📊 Standings
                           </Typography>

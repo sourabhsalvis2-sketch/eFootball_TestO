@@ -1210,6 +1210,37 @@ export class DatabaseService {
     return this.getOne<Player>('SELECT * FROM players WHERE id = ?', [winnerId])
   }
 
+  static async getTournamentRunnerUp(tournamentId: number): Promise<Player | null> {
+    const finals = await this.executeQuery<Match>(
+      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'final' AND status = 'completed'",
+      [tournamentId]
+    )
+
+    if (finals.length === 0) return null
+
+    const final = finals[0]
+    // Runner-up is the loser of the final
+    const runnerUpId = Number(final.score1) > Number(final.score2) ? final.player2_id : final.player1_id
+
+    return this.getOne<Player>('SELECT * FROM players WHERE id = ?', [runnerUpId])
+  }
+
+  static async getTournamentThirdPlace(tournamentId: number): Promise<Player | null> {
+    const thirdPlaceMatches = await this.executeQuery<Match>(
+      "SELECT * FROM matches WHERE tournament_id = ? AND round = 'third-place' AND status = 'completed'",
+      [tournamentId]
+    )
+
+    if (thirdPlaceMatches.length === 0) return null
+
+    const thirdPlaceMatch = thirdPlaceMatches[0]
+    const thirdPlaceId = Number(thirdPlaceMatch.score1) > Number(thirdPlaceMatch.score2) 
+      ? thirdPlaceMatch.player1_id 
+      : thirdPlaceMatch.player2_id
+
+    return this.getOne<Player>('SELECT * FROM players WHERE id = ?', [thirdPlaceId])
+  }
+
   static async deleteTournament(tournamentId: number): Promise<void> {
     // Delete in the correct order to respect foreign key constraints
     // 1. Delete matches first

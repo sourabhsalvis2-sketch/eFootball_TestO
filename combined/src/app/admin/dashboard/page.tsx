@@ -671,10 +671,17 @@ export default function AdminDashboard() {
                   <AccordionDetails>
                     <Box className="matches-list">
                       {t.matches?.sort((a: any, b: any) => {
-                        // Define round order: final first, then semi, then group
-                        const roundOrder = { final: 0, semi: 1, group: 2 }
-                        const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
-                        const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
+                        // Define round order: final first, then third-place, semi, quarter, then group
+                        const roundOrder = { 
+                          final: 0, 
+                          'third-place': 1, 
+                          semi: 2, 
+                          quarter: 3, 
+                          'round-of-16': 4,
+                          group: 5 
+                        }
+                        const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 6
+                        const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 6
                         if (aOrder !== bOrder) return aOrder - bOrder
                         // If same round, sort by id
                         return a.id - b.id

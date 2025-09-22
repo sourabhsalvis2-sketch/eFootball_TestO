@@ -526,15 +526,27 @@ export default function Home() {
                             (() => {
                               // Sort matches as before
                               const sortedMatches = [...t.matches].sort((a: any, b: any) => {
-                                const roundOrder = { final: 0, semi: 1, group: 2 }
-                                const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 3
-                                const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 3
+                                // Define round order: final first, then third-place, semi, quarter, then group
+                                const roundOrder = { 
+                                  final: 0, 
+                                  'third-place': 1, 
+                                  semi: 2, 
+                                  quarter: 3, 
+                                  'round-of-16': 4,
+                                  group: 5 
+                                }
+                                const aOrder = roundOrder[a.round as keyof typeof roundOrder] ?? 6
+                                const bOrder = roundOrder[b.round as keyof typeof roundOrder] ?? 6
                                 if (aOrder !== bOrder) return aOrder - bOrder
                                 return a.id - b.id
                               });
-                              // Split matches
-                              const mainMatches = sortedMatches.filter((m: any) => m.round === 'final' || m.round === 'semi');
-                              const otherMatches = sortedMatches.filter((m: any) => m.round !== 'final' && m.round !== 'semi');
+                              // Split matches - include quarter and third-place in main matches
+                              const mainMatches = sortedMatches.filter((m: any) => 
+                                m.round === 'final' || m.round === 'semi' || m.round === 'quarter' || m.round === 'third-place' || m.round === 'round-of-16'
+                              );
+                              const otherMatches = sortedMatches.filter((m: any) => 
+                                m.round !== 'final' && m.round !== 'semi' && m.round !== 'quarter' && m.round !== 'third-place' && m.round !== 'round-of-16'
+                              );
                               const expanded = details[t.id]?.showAllMatches;
                               return (
                                 <>

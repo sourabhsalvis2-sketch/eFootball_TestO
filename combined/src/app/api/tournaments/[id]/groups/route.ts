@@ -49,11 +49,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         grouped[stat.group].push(stat)
       }
 
-      const groupStandings = Object.entries(grouped).map(([groupName, players]) => ({
-        groupLetter: groupName.replace('GROUP ', ''),
-        groupName,
-        players: players.sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor)
-      }))
+      const groupStandings = Object.entries(grouped)
+        .sort(([groupNameA], [groupNameB]) => groupNameA.localeCompare(groupNameB))
+        .map(([groupName, players]) => ({
+          groupLetter: groupName.replace('GROUP ', ''),
+          groupName,
+          players: players.sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor)
+        }))
 
       return NextResponse.json({
         tournamentId,

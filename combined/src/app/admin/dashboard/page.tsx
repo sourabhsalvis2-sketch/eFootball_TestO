@@ -11,6 +11,12 @@ export default function AdminDashboard() {
   const [allPlayers, setAllPlayers] = useState<any[]>([])
   const [name, setName] = useState('')
   const [playerName, setPlayerName] = useState('')
+  // Tournament creation settings
+  const [tournamentType, setTournamentType] = useState<'round_robin' | 'group_and_knockout'>('round_robin')
+  const [teamsPerGroup, setTeamsPerGroup] = useState(4)
+  const [teamsAdvancing, setTeamsAdvancing] = useState(2)
+  const [allowThirdPlace, setAllowThirdPlace] = useState(false)
+  const [thirdPlacePlayoff, setThirdPlacePlayoff] = useState(false)
   const [selectedTournament, setSelectedTournament] = useState<number | null>(null)
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false)
   const [currentMatch, setCurrentMatch] = useState<any | null>(null)
@@ -40,10 +46,38 @@ export default function AdminDashboard() {
 
   async function createTournament() {
     if (!name.trim()) return alert('Enter a tournament name')
+    
+    // Validate group + knockout settings
+    if (tournamentType === 'group_and_knockout') {
+      if (teamsPerGroup < 3 || teamsPerGroup > 8) {
+        return alert('Teams per group must be between 3 and 8')
+      }
+      if (teamsAdvancing < 1 || teamsAdvancing >= teamsPerGroup) {
+        return alert('Teams advancing must be less than teams per group')
+      }
+    }
+    
     setCreatingTournament(true)
     try {
-      await apiClient.post('/api/tournaments', { name })
+      const config = {
+        name,
+        type: tournamentType,
+        teamsPerGroup,
+        teamsAdvancingPerGroup: teamsAdvancing,
+        allowThirdPlaceTeams: allowThirdPlace,
+        thirdPlacePlayoff
+      }
+      
+      await apiClient.post('/api/tournaments', config)
+      
+      // Reset form
       setName('')
+      setTournamentType('round_robin')
+      setTeamsPerGroup(4)
+      setTeamsAdvancing(2)
+      setAllowThirdPlace(false)
+      setThirdPlacePlayoff(tournamentType === 'group_and_knockout')
+      
       load()
     } finally {
       setCreatingTournament(false)
@@ -165,6 +199,70 @@ export default function AdminDashboard() {
     alert(JSON.stringify(r.data, null, 2))
   }
 
+  async function showGroupStandings(tid: number) {
+    try {
+      const r = await apiClient.get(`/api/tournaments/${tid}/groups`)
+      
+      let output = `Group Standings for Tournament: ${r.data.tournamentName}\n\n`
+      
+      r.data.groupStandings.forEach((group: any) => {
+        output += `${group.groupName}:\n`
+        output += `Pos | Player | P | W | D | L | GF | GA | GD | Pts\n`
+        output += `----+--------+---+---+---+---+----+----+----+----\n`
+        
+        group.players.forEach((player: any, index: number) => {
+          output += `${(index + 1).toString().padStart(3)} | ${player.name.padEnd(6)} | ${player.played} | ${player.wins} | ${player.draws} | ${player.losses} | ${player.goalsFor.toString().padStart(2)} | ${player.goalsAgainst.toString().padStart(2)} | ${(player.goalDiff >= 0 ? '+' : '') + player.goalDiff.toString().padStart(2)} | ${player.points.toString().padStart(2)}\n`
+        })
+        output += '\n'
+      })
+      
+      alert(output)
+    } catch (error) {
+      alert('Failed to fetch group standings')
+    }
+  }
+
+  async function showKnockoutBracket(tid: number) {
+    try {
+      const r = await apiClient.get(`/api/tournaments/${tid}/bracket`)
+      
+      let output = `Knockout Bracket for Tournament: ${r.data.tournamentName}\n\n`
+      
+      const rounds = ['round-of-16', 'quarter', 'semi', 'final', 'third-place']
+      const roundNames = {
+        'round-of-16': 'Round of 16',
+        'quarter': 'Quarter Finals', 
+        'semi': 'Semi Finals',
+        'final': 'Final',
+        'third-place': 'Third Place Playoff'
+      }
+      
+      rounds.forEach(round => {
+        const matches = r.data.bracket[round]
+        if (matches && matches.length > 0) {
+          output += `${roundNames[round as keyof typeof roundNames]}:\n`
+          matches.forEach((match: any, index: number) => {
+            const p1Name = match.player1_name || 'TBD'
+            const p2Name = match.player2_name || 'TBD'
+            const score = match.status === 'completed' 
+              ? `${match.score1}-${match.score2}`
+              : 'Not played'
+            output += `  ${index + 1}. ${p1Name} vs ${p2Name} (${score})\n`
+          })
+          output += '\n'
+        }
+      })
+      
+      if (output.trim() === `Knockout Bracket for Tournament: ${r.data.tournamentName}`) {
+        output += 'No knockout matches have been generated yet.\nComplete all group stage matches to generate the bracket.'
+      }
+      
+      alert(output)
+    } catch (error) {
+      alert('Failed to fetch knockout bracket')
+    }
+  }
+
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
@@ -237,18 +335,90 @@ export default function AdminDashboard() {
                 label="Tournament name" 
                 value={name} 
                 onChange={e => setName(e.target.value)} 
-                sx={{ mt: 1 }}
+                sx={{ mt: 1, mb: 2 }}
                 className="dashboard-input"
               />
+              
+              <Typography variant="subtitle2" sx={{ mb: 1, color: '#b0bec5' }}>
+                Tournament Type
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Button 
+                  variant={tournamentType === 'round_robin' ? "contained" : "outlined"}
+                  onClick={() => {
+                    setTournamentType('round_robin')
+                    setThirdPlacePlayoff(false)
+                  }}
+                  sx={{ mr: 1, mb: 1 }}
+                  size="small"
+                >
+                  Round Robin
+                </Button>
+                <Button 
+                  variant={tournamentType === 'group_and_knockout' ? "contained" : "outlined"}
+                  onClick={() => {
+                    setTournamentType('group_and_knockout')
+                    setThirdPlacePlayoff(true)
+                  }}
+                  size="small"
+                  sx={{ mb: 1 }}
+                >
+                  Group + Knockout
+                </Button>
+              </Box>
+
+              {tournamentType === 'group_and_knockout' && (
+                <Box sx={{ mb: 2 }}>
+                  <TextField 
+                    fullWidth 
+                    label="Teams per group" 
+                    type="number"
+                    value={teamsPerGroup} 
+                    onChange={e => setTeamsPerGroup(Number(e.target.value))} 
+                    inputProps={{ min: 3, max: 8 }}
+                    sx={{ mb: 1 }}
+                    size="small"
+                  />
+                  <TextField 
+                    fullWidth 
+                    label="Teams advancing per group" 
+                    type="number"
+                    value={teamsAdvancing} 
+                    onChange={e => setTeamsAdvancing(Number(e.target.value))} 
+                    inputProps={{ min: 1, max: teamsPerGroup - 1 }}
+                    sx={{ mb: 1 }}
+                    size="small"
+                  />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Button 
+                      variant={allowThirdPlace ? "contained" : "outlined"}
+                      onClick={() => setAllowThirdPlace(!allowThirdPlace)}
+                      size="small"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Allow 3rd place teams: {allowThirdPlace ? 'Yes' : 'No'}
+                    </Button>
+                    <Button 
+                      variant={thirdPlacePlayoff ? "contained" : "outlined"}
+                      onClick={() => setThirdPlacePlayoff(!thirdPlacePlayoff)}
+                      size="small"
+                      sx={{ textTransform: 'none' }}
+                    >
+                      3rd place playoff: {thirdPlacePlayoff ? 'Yes' : 'No'}
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+
               <Button 
                 variant="contained" 
-                sx={{ mt: 1 }} 
+                fullWidth
                 onClick={createTournament}
                 className="dashboard-button"
                 disabled={creatingTournament}
               >
                 {creatingTournament ? <CircularProgress size={16} sx={{ mr: 1 }} /> : null}
-                Create
+                Create Tournament
               </Button>
             </CardContent>
           </Card>
@@ -315,6 +485,16 @@ export default function AdminDashboard() {
               <CardContent>
                 <Typography className="tournament-name">{t.name} <span className="tournament-id">(id: {t.id})</span></Typography>
                 <Typography variant="body2" className="tournament-status">Status: {t.status}</Typography>
+                <Typography variant="body2" sx={{ color: '#81c784', fontWeight: 'bold' }}>
+                  Type: {t.type === 'group_and_knockout' ? 'Group + Knockout' : 'Round Robin'}
+                </Typography>
+                {t.type === 'group_and_knockout' && (
+                  <Typography variant="caption" sx={{ color: '#b0bec5', display: 'block' }}>
+                    {t.teams_per_group} per group, {t.teams_advancing_per_group} advance
+                    {t.allow_third_place_teams && ' + 3rd place teams'}
+                    {t.third_place_playoff && ', 3rd place playoff'}
+                  </Typography>
+                )}
                 <Box className="tournament-actions">
                   <Button 
                     sx={{ mr: 1 }} 
@@ -408,14 +588,37 @@ export default function AdminDashboard() {
                     ))}
                   </Box>
                 </Box>
-                <Box sx={{ mt: 1 }}>
+                <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   <Button 
                     variant="outlined" 
                     onClick={() => showStandings(t.id)}
                     className="standings-button"
+                    size="small"
                   >
                     Show Standings
                   </Button>
+                  {t.type === 'group_and_knockout' && (
+                    <>
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => showGroupStandings(t.id)}
+                        className="standings-button"
+                        size="small"
+                        sx={{ color: '#81c784', borderColor: '#81c784' }}
+                      >
+                        Group Tables
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        onClick={() => showKnockoutBracket(t.id)}
+                        className="standings-button"
+                        size="small"
+                        sx={{ color: '#ff9800', borderColor: '#ff9800' }}
+                      >
+                        Knockout Bracket
+                      </Button>
+                    </>
+                  )}
                 </Box>
               </CardContent>
             </Card>

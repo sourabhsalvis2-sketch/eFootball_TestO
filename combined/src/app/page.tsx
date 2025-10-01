@@ -349,7 +349,9 @@ export default function Home() {
                             📊 Standings
                           </Typography>
                           {Object.keys(groupedStandings).length > 0 ? (
-                            Object.entries(groupedStandings).map(([groupName, standings]) => (
+                            Object.entries(groupedStandings)
+                              .sort(([a], [b]) => a.localeCompare(b))
+                              .map(([groupName, standings]) => (
                               <Box key={groupName} sx={{ mb: 4 }}>
                                 <Typography variant="h6" sx={{ color: '#00e5ff', mb: 1 }}>
                                   {groupName}
